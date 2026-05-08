@@ -1,0 +1,67 @@
+name: Quality Checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  og-image-check:
+    name: og:image sur /actualites
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: node scripts/ci/og_check.mjs
+        env:
+          SITE: https://legalform.ci
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          OUT_DIR: ./reports/og
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: og-image-report, path: reports/og }
+
+  supabase-linter:
+    name: Supabase linter (sécurité)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with: { version: latest }
+      - name: Run Supabase database linter
+        run: |
+          supabase db lint --linked --level warning > reports/supabase-lint.txt 2>&1 || EXIT=$?
+          cat reports/supabase-lint.txt
+          # Échoue si ERROR détectée (les WARN seules n'arrêtent pas le build)
+          grep -q '^ERROR' reports/supabase-lint.txt && exit 1 || exit ${EXIT:-0}
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_ID:   ${{ secrets.SUPABASE_PROJECT_ID }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: supabase-lint, path: reports/supabase-lint.txt }
+
+  lighthouse:
+    name: Lighthouse mobile + desktop (seuil 90)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: |
+          npm i --no-save lighthouse chrome-launcher
+          node scripts/ci/lighthouse_check.mjs
+        env:
+          URL: https://legalform.ci
+          THRESHOLD: '90'
+          OUT_DIR: ./reports/lighthouse
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: lighthouse-report, path: reports/lighthouse }
