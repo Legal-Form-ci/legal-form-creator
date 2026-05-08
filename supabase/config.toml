@@ -1,0 +1,55 @@
+project_id = "xwtmnzorzsvkamqemddk"
+
+[functions.firecrawl-search]
+verify_jwt = false
+
+[functions.firecrawl-scrape]
+verify_jwt = false
+
+[functions.create-super-admin]
+verify_jwt = false
+
+[functions.lexia-chat]
+verify_jwt = false
+
+[functions.create-payment]
+verify_jwt = false
+
+[functions.payment-webhook]
+verify_jwt = false
+
+[functions.verify-kkiapay-payment]
+verify_jwt = false
+
+[functions.send-notification]
+verify_jwt = false
+
+[functions.send-status-notification]
+verify_jwt = false
+
+[functions.send-payment-notification]
+verify_jwt = false
+
+[functions.notify-id-validation]
+verify_jwt = false
+
+[functions.upload-document]
+verify_jwt = false
+
+[functions.secure-public-tracking]
+verify_jwt = false
+
+[functions.ai-content-generator]
+verify_jwt = false
+
+[functions.forum-ai-generate]
+verify_jwt = false
+
+[functions.delete-admin-user]
+verify_jwt = false
+
+[functions.translate-content]
+verify_jwt = false
+
+[functions.check-dns-records]
+verify_jwt = false

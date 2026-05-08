@@ -1,0 +1,13 @@
+RewriteEngine On
+RewriteBase /
+
+# Serve dynamic OG meta tags to social crawlers for article pages
+# Detects social/SEO bots and proxies to the og-image edge function
+RewriteCond %{HTTP_USER_AGENT} (facebookexternalhit|twitterbot|linkedinbot|whatsapp|telegrambot|slackbot|discordbot|googlebot|bingbot|pinterest|skypeuripreview|applebot|embedly|quora\ link\ preview|outbrain|vkshare|w3c_validator|redditbot|bot|crawler|spider) [NC]
+RewriteRule ^actualites/([A-Za-z0-9_-]+)/?$ https://xwtmnzorzsvkamqemddk.supabase.co/functions/v1/og-image?id=$1 [L,R=302,NE]
+
+# SPA fallback
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
