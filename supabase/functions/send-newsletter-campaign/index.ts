@@ -32,7 +32,7 @@ serve(async (req) => {
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
-    const { campaignId, testEmail, mode } = body;
+    const { campaignId, testEmail, mode, segment } = body;
     const simulate = body?.simulate === true;
     if (simulate && !isServiceCaller) return json({ error: "Simulation réservée aux tests serveur" }, 403);
 
@@ -61,7 +61,7 @@ serve(async (req) => {
 
     if (!campaignId) return json({ error: "campaignId required" }, 400);
 
-    const result = await sendCampaign(supabase, RESEND_API_KEY, LOVABLE_API_KEY, campaignId, testEmail);
+    const result = await sendCampaign(supabase, RESEND_API_KEY, LOVABLE_API_KEY, campaignId, testEmail, { segment });
     return json(result);
   } catch (e: any) {
     console.error("send-newsletter-campaign error:", e);
@@ -81,7 +81,7 @@ async function sendCampaign(
   LOVABLE_API_KEY: string,
   campaignId: string,
   testEmail?: string,
-  options: { simulate?: boolean } = {},
+  options: { simulate?: boolean; segment?: string } = {},
 ) {
   const { data: campaign, error: campErr } = await supabase
     .from("newsletter_campaigns").select("*").eq("id", campaignId).maybeSingle();
@@ -101,14 +101,13 @@ async function sendCampaign(
       .eq("id", campaignId);
   }
 
-  // Fetch recipients
+  // Resolve recipients by segment
   let recipients: { email: string; full_name: string | null }[] = [];
   if (testEmail) {
     recipients = [{ email: testEmail, full_name: null }];
   } else {
-    const { data: subs } = await supabase
-      .from("newsletter_subscribers").select("email, full_name").eq("is_active", true);
-    recipients = subs || [];
+    const segment = options.segment || "subscribers";
+    recipients = await resolveSegment(supabase, segment);
   }
 
   // Skip recipients already successfully sent for THIS campaign (retry-safety)
