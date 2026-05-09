@@ -1,1 +1,7 @@
 project_id = "xwtmnzorzsvkamqemddk"
+
+[functions.auth-email-hook]
+verify_jwt = false
+
+[functions.resend-webhook]
+verify_jwt = false
