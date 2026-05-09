@@ -38,8 +38,11 @@ const NewsletterSubscribe = ({ source = "footer", variant = "footer" }: Props) =
           throw error;
         }
       } else {
-        toast({ title: "Inscription confirmée 🎉", description: "Merci ! Vous recevrez nos prochaines actualités." });
+        toast({ title: "Inscription confirmée 🎉", description: "Merci ! Un email de bienvenue vous a été envoyé." });
         setEmail("");
+        // Fire-and-forget welcome email — never block the UI on this
+        supabase.functions.invoke("send-newsletter-welcome", { body: { email: trimmed } })
+          .catch((err) => console.warn("welcome email failed:", err));
       }
     } catch (err: any) {
       toast({ title: "Erreur", description: err.message || "Échec de l'inscription. Réessayez.", variant: "destructive" });
