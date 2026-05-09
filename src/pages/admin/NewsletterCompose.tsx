@@ -9,8 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import WysiwygEditor from "@/components/WysiwygEditor";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText } from "lucide-react";
+import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import DnsStatusCard from "@/components/admin/DnsStatusCard";
 
@@ -27,24 +28,44 @@ interface Campaign {
   created_at: string;
 }
 
+const SEGMENTS = [
+  { value: "subscribers", label: "Abonnés newsletter" },
+  { value: "requesters", label: "Demandeurs (services & sociétés)" },
+  { value: "internal", label: "Membres internes (équipe)" },
+  { value: "users", label: "Tous les utilisateurs (profils)" },
+  { value: "all", label: "Tout le monde (union)" },
+];
+
 const NewsletterCompose = () => {
   const { toast } = useToast();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [subject, setSubject] = useState("");
-  const [html, setHtml] = useState("<h2>Bonjour 👋</h2>\n<p>Voici les nouveautés Legal Form…</p>");
+  const [html, setHtml] = useState("<h2>Bonjour 👋</h2>\n<p>Voici les nouveautés LegalForm…</p>");
   const [scheduledAt, setScheduledAt] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [testEmail, setTestEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeSubs, setActiveSubs] = useState(0);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [segment, setSegment] = useState("subscribers");
+  const [counts, setCounts] = useState<Record<string, number>>({});
 
   const load = async () => {
-    const [{ data: list }, { count }] = await Promise.all([
+    const [{ data: list }, subs, requesters, intern, users] = await Promise.all([
       supabase.from("newsletter_campaigns").select("*").order("created_at", { ascending: false }),
-      supabase.from("newsletter_subscribers").select("*", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("newsletter_subscribers").select("id", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("company_requests").select("id", { count: "exact", head: true }),
+      supabase.from("team_members").select("id", { count: "exact", head: true }).eq("is_active", true),
+      supabase.from("profiles").select("id", { count: "exact", head: true }),
     ]);
     setCampaigns(list || []);
-    setActiveSubs(count || 0);
+    setCounts({
+      subscribers: subs.count || 0,
+      requesters: requesters.count || 0,
+      internal: intern.count || 0,
+      users: users.count || 0,
+      all: (subs.count || 0) + (requesters.count || 0) + (intern.count || 0) + (users.count || 0),
+    });
   };
 
   useEffect(() => { load(); }, []);
@@ -52,8 +73,29 @@ const NewsletterCompose = () => {
   const reset = () => {
     setEditingId(null);
     setSubject("");
-    setHtml("<h2>Bonjour 👋</h2>\n<p>Voici les nouveautés Legal Form…</p>");
+    setHtml("<h2>Bonjour 👋</h2>\n<p>Voici les nouveautés LegalForm…</p>");
     setScheduledAt("");
+    setAiPrompt("");
+  };
+
+  const generateWithAI = async () => {
+    if (!aiPrompt.trim()) {
+      toast({ title: "Prompt requis", description: "Décrivez en quelques mots le message à générer.", variant: "destructive" });
+      return;
+    }
+    setAiLoading(true);
+    const { data, error } = await supabase.functions.invoke("ai-email-generate", {
+      body: { prompt: aiPrompt, subject },
+    });
+    setAiLoading(false);
+    if (error || data?.error) {
+      toast({ title: "Erreur IA", description: error?.message || data?.error, variant: "destructive" });
+      return;
+    }
+    if (data?.html) {
+      setHtml(data.html);
+      toast({ title: "Contenu généré ✨", description: "Vous pouvez l'éditer manuellement avant l'envoi." });
+    }
   };
 
   const save = async (asScheduled = false) => {
@@ -94,11 +136,13 @@ const NewsletterCompose = () => {
       toast({ title: "Indiquez un email de test", variant: "destructive" });
       return;
     }
-    if (!isTest && !confirm(`Envoyer maintenant à ${activeSubs} abonnés actifs ?`)) return;
+    const segLabel = SEGMENTS.find((s) => s.value === segment)?.label;
+    const segCount = counts[segment] || 0;
+    if (!isTest && !confirm(`Envoyer maintenant à ${segCount} destinataire(s) — ${segLabel} ?`)) return;
 
     setLoading(true);
     const { data, error } = await supabase.functions.invoke("send-newsletter-campaign", {
-      body: { campaignId, testEmail: isTest ? testEmail : undefined },
+      body: { campaignId, testEmail: isTest ? testEmail : undefined, segment },
     });
     setLoading(false);
     if (error) {
@@ -141,8 +185,10 @@ const NewsletterCompose = () => {
       <div className="space-y-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2"><Mail className="h-6 w-6 sm:h-7 sm:w-7" /> Composer la newsletter</h1>
-            <p className="text-muted-foreground">{activeSubs} abonné(s) actif(s)</p>
+            <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
+              <Mail className="h-6 w-6 sm:h-7 sm:w-7" /> Campagnes mailing
+            </h1>
+            <p className="text-muted-foreground">Newsletters, annonces et messages ciblés — assisté par IA.</p>
           </div>
           <Button asChild variant="outline" size="sm">
             <Link to="/admin/newsletter/logs"><ScrollText className="h-4 w-4 mr-1" /> Journal des envois</Link>
@@ -152,10 +198,14 @@ const NewsletterCompose = () => {
         <div className="grid gap-4 md:grid-cols-2">
           <DnsStatusCard />
           <Card>
-            <CardHeader className="pb-2"><CardTitle className="text-base">Astuce</CardTitle></CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Tant que SPF/DKIM/DMARC ne sont pas <strong>OK</strong>, les emails risquent d'être marqués comme spam.
-              Ajoutez les enregistrements DNS fournis dans Resend depuis votre hébergeur.
+            <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Users className="h-4 w-4" /> Audiences disponibles</CardTitle></CardHeader>
+            <CardContent className="text-sm space-y-1">
+              {SEGMENTS.map((s) => (
+                <div key={s.value} className="flex justify-between">
+                  <span className="text-muted-foreground">{s.label}</span>
+                  <span className="font-semibold">{counts[s.value] ?? "—"}</span>
+                </div>
+              ))}
             </CardContent>
           </Card>
         </div>
@@ -170,24 +220,56 @@ const NewsletterCompose = () => {
             <Card>
               <CardHeader>
                 <CardTitle>{editingId ? "Modifier la campagne" : "Nouvelle campagne"}</CardTitle>
-                <CardDescription>Composez en HTML. Un lien de désinscription RGPD est ajouté automatiquement.</CardDescription>
+                <CardDescription>L'email sera enrobé automatiquement (logo, header, footer, désinscription).</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <Label>Sujet de l'email</Label>
-                  <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Newsletter Legal Form – Mai 2026" />
+                  <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Newsletter LegalForm – Mai 2026" />
                 </div>
+
+                <div className="space-y-2 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent p-4">
+                  <Label className="flex items-center gap-2 text-primary"><Sparkles className="h-4 w-4" /> Assistant IA</Label>
+                  <p className="text-xs text-muted-foreground">Décrivez votre message en quelques mots, l'IA génère un email professionnel à votre charte.</p>
+                  <Textarea
+                    value={aiPrompt}
+                    onChange={(e) => setAiPrompt(e.target.value)}
+                    placeholder="Ex : annoncer notre nouvelle offre de création SARL à 99 000 FCFA en mai, avec témoignage client."
+                    rows={3}
+                  />
+                  <Button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()} type="button">
+                    {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                    Générer avec l'IA
+                  </Button>
+                </div>
+
                 <div className="space-y-2">
-                  <Label>Contenu de l'email</Label>
+                  <Label>Contenu de l'email (modifiable)</Label>
                   <WysiwygEditor value={html} onChange={setHtml} className="rounded-md border" />
                   <details className="text-xs text-muted-foreground">
                     <summary className="cursor-pointer">Éditer le HTML brut (avancé)</summary>
                     <Textarea value={html} onChange={(e) => setHtml(e.target.value)} rows={8} className="font-mono text-xs mt-2" />
                   </details>
                 </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Planifier (optionnel)</Label>
-                  <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2"><Users className="h-4 w-4" /> Segment destinataires</Label>
+                    <Select value={segment} onValueChange={setSegment}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {SEGMENTS.map((s) => (
+                          <SelectItem key={s.value} value={s.value}>
+                            {s.label} {counts[s.value] !== undefined ? `(${counts[s.value]})` : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Planifier (optionnel)</Label>
+                    <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+                  </div>
                 </div>
 
                 <div className="grid gap-2 sm:flex sm:flex-wrap">
@@ -217,9 +299,10 @@ const NewsletterCompose = () => {
             </Card>
 
             <Card>
-              <CardHeader><CardTitle className="flex items-center gap-2"><Eye className="h-5 w-5" /> Aperçu</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="flex items-center gap-2"><Eye className="h-5 w-5" /> Aperçu (corps seul)</CardTitle></CardHeader>
               <CardContent>
-                <div className="border rounded-lg p-4 bg-white text-black max-h-[400px] overflow-auto" dangerouslySetInnerHTML={{ __html: html }} />
+                <div className="border rounded-lg p-6 bg-white text-black max-h-[500px] overflow-auto" dangerouslySetInnerHTML={{ __html: html }} />
+                <p className="text-xs text-muted-foreground mt-2">Le destinataire recevra ce contenu enrobé du header (logo) et du footer LegalForm.</p>
               </CardContent>
             </Card>
           </TabsContent>
