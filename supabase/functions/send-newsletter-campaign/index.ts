@@ -5,6 +5,7 @@
 // - FROM email configurable via NEWSLETTER_FROM secret (fallback legalform.ci)
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { brandedEmail } from "../_shared/email-template.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -134,12 +135,11 @@ async function sendCampaign(
     }
 
     const unsub = `https://www.legalform.ci/newsletter/unsubscribe?email=${encodeURIComponent(r.email)}`;
-    const html = `${campaign.html_content}
-<hr style="margin:32px 0;border:none;border-top:1px solid #eee" />
-<p style="font-size:12px;color:#888;text-align:center">
-  Vous recevez cet email car vous êtes inscrit à la newsletter Legal Form.<br/>
-  <a href="${unsub}" style="color:#888">Se désabonner</a>
-</p>`;
+    const html = brandedEmail({
+      bodyHtml: campaign.html_content,
+      unsubscribeUrl: unsub,
+      preheader: campaign.subject,
+    });
 
     let providerId: string | null = null;
     let errMsg: string | null = null;
@@ -213,4 +213,46 @@ async function sendCampaign(
   }
 
   return { success, failure, skipped, total: recipients.length, test: !!testEmail, simulated: !!options.simulate };
+}
+
+// Resolve recipient list by named segment.
+// Returns deduplicated [{email, full_name}] from the requested audience.
+async function resolveSegment(supabase: any, segment: string): Promise<{ email: string; full_name: string | null }[]> {
+  const map = new Map<string, { email: string; full_name: string | null }>();
+  const add = (email?: string | null, full_name?: string | null) => {
+    if (!email) return;
+    const e = email.toLowerCase().trim();
+    if (!e.includes("@")) return;
+    if (!map.has(e)) map.set(e, { email: e, full_name: full_name || null });
+  };
+
+  const wantSubs = ["subscribers", "all"].includes(segment);
+  const wantRequesters = ["requesters", "all"].includes(segment);
+  const wantInternal = ["internal", "all"].includes(segment);
+  const wantUsers = ["users", "all"].includes(segment);
+
+  if (wantSubs) {
+    const { data } = await supabase
+      .from("newsletter_subscribers").select("email, full_name").eq("is_active", true);
+    (data || []).forEach((r: any) => add(r.email, r.full_name));
+  }
+  if (wantRequesters) {
+    const { data: cr } = await supabase
+      .from("company_requests").select("email, contact_name");
+    (cr || []).forEach((r: any) => add(r.email, r.contact_name));
+    const { data: sr } = await supabase
+      .from("service_requests").select("contact_email, contact_name");
+    (sr || []).forEach((r: any) => add(r.contact_email, r.contact_name));
+  }
+  if (wantInternal) {
+    const { data } = await supabase
+      .from("team_members").select("email, full_name").eq("is_active", true);
+    (data || []).forEach((r: any) => add(r.email, r.full_name));
+  }
+  if (wantUsers) {
+    const { data } = await supabase
+      .from("profiles").select("email, full_name");
+    (data || []).forEach((r: any) => add(r.email, r.full_name));
+  }
+  return Array.from(map.values());
 }
