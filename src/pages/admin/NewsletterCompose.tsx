@@ -195,8 +195,8 @@ const NewsletterCompose = () => {
           </Button>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <DnsStatusCard />
+        <div className="grid gap-4">
+
           <Card>
             <CardHeader className="pb-2"><CardTitle className="text-base flex items-center gap-2"><Users className="h-4 w-4" /> Audiences disponibles</CardTitle></CardHeader>
             <CardContent className="text-sm space-y-1">
