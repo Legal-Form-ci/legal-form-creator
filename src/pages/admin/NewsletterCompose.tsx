@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users } from "lucide-react";
 import { Link } from "react-router-dom";
-import DnsStatusCard from "@/components/admin/DnsStatusCard";
+
 
 interface Campaign {
   id: string;
