@@ -160,7 +160,7 @@ async function sendCampaign(
         recipient_email: r.email,
         status: ok ? "success" : "failed",
         provider_message_id: providerId,
-        error_message: errMsg,
+        error_message: ok ? `via:${usedProvider}` : `${usedProvider}: ${errMsg}`,
       });
     }
     await new Promise((r) => setTimeout(r, 50));
