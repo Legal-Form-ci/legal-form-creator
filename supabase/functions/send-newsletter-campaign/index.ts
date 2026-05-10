@@ -21,24 +21,17 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const authHeader = req.headers.get("Authorization") || req.headers.get("authorization") || "";
     const isServiceCaller = authHeader === `Bearer ${serviceKey}`;
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY_1") || Deno.env.get("RESEND_API_KEY");
-
-    if (!LOVABLE_API_KEY) return json({ error: "LOVABLE_API_KEY missing" }, 500);
-    if (!RESEND_API_KEY) return json({ error: "Resend connector not linked (RESEND_API_KEY_1 missing)" }, 500);
 
     const supabase = createClient(supabaseUrl, serviceKey);
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
-    const { campaignId, testEmail, mode, segment } = body;
+    const { campaignId, testEmail, mode, segment, preferredProvider } = body;
     const simulate = body?.simulate === true;
     if (simulate && !isServiceCaller) return json({ error: "Simulation réservée aux tests serveur" }, 403);
 
     if (mode === "cron") {
-      // 1) Recover stuck campaigns
       await supabase.rpc("reset_stuck_newsletter_campaigns");
-      // 2) Pick due scheduled campaigns
       let dueQuery = supabase
         .from("newsletter_campaigns")
         .select("id")
@@ -52,7 +45,7 @@ serve(async (req) => {
 
       const results: any[] = [];
       for (const c of due || []) {
-        const r = await sendCampaign(supabase, RESEND_API_KEY, LOVABLE_API_KEY, c.id, undefined, { simulate });
+        const r = await sendCampaign(supabase, c.id, undefined, { simulate, preferredProvider });
         results.push({ id: c.id, ...r });
       }
       return json({ processed: results.length, results });
@@ -60,7 +53,7 @@ serve(async (req) => {
 
     if (!campaignId) return json({ error: "campaignId required" }, 400);
 
-    const result = await sendCampaign(supabase, RESEND_API_KEY, LOVABLE_API_KEY, campaignId, testEmail, { segment });
+    const result = await sendCampaign(supabase, campaignId, testEmail, { segment, preferredProvider });
     return json(result);
   } catch (e: any) {
     console.error("send-newsletter-campaign error:", e);
