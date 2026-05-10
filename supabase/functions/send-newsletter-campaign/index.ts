@@ -69,18 +69,15 @@ function json(data: any, status = 200) {
 
 async function sendCampaign(
   supabase: any,
-  RESEND_API_KEY: string,
-  LOVABLE_API_KEY: string,
   campaignId: string,
   testEmail?: string,
-  options: { simulate?: boolean; segment?: string } = {},
+  options: { simulate?: boolean; segment?: string; preferredProvider?: "brevo" | "resend" } = {},
 ) {
   const { data: campaign, error: campErr } = await supabase
     .from("newsletter_campaigns").select("*").eq("id", campaignId).maybeSingle();
 
   if (campErr || !campaign) return { error: "Campaign not found", success: 0, failure: 0, total: 0 };
 
-  // Mark as sending (only if not already in-flight to avoid double-send)
   if (!testEmail) {
     if (campaign.status === "sent") {
       return { skipped: true, reason: "already sent", success: 0, failure: 0, total: 0 };
@@ -93,7 +90,6 @@ async function sendCampaign(
       .eq("id", campaignId);
   }
 
-  // Resolve recipients by segment
   let recipients: { email: string; full_name: string | null }[] = [];
   if (testEmail) {
     recipients = [{ email: testEmail, full_name: null }];
@@ -102,7 +98,6 @@ async function sendCampaign(
     recipients = await resolveSegment(supabase, segment);
   }
 
-  // Skip recipients already successfully sent for THIS campaign (retry-safety)
   let alreadySent = new Set<string>();
   if (!testEmail) {
     const { data: prior } = await supabase
@@ -126,8 +121,11 @@ async function sendCampaign(
     }
 
     const unsub = `https://www.legalform.ci/newsletter/unsubscribe?email=${encodeURIComponent(r.email)}`;
+    const greeting = r.full_name
+      ? `<p style="font-size:15px;color:#1f2937;margin:0 0 12px">Bonjour ${escapeHtml(r.full_name)},</p>`
+      : "";
     const html = brandedEmail({
-      bodyHtml: campaign.html_content,
+      bodyHtml: greeting + campaign.html_content,
       unsubscribeUrl: unsub,
       preheader: campaign.subject,
     });
@@ -135,35 +133,23 @@ async function sendCampaign(
     let providerId: string | null = null;
     let errMsg: string | null = null;
     let ok = false;
+    let usedProvider = "simulated";
 
-    try {
-      if (options.simulate) {
-        ok = true;
-        providerId = `simulated-${crypto.randomUUID()}`;
-      } else {
-        const ctrl = new AbortController();
-        const timeout = setTimeout(() => ctrl.abort(), 15000);
-        const res = await fetch(`${GATEWAY_URL}/emails`, {
-          method: "POST",
-          signal: ctrl.signal,
-          headers: {
-            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": RESEND_API_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ from: DEFAULT_FROM, to: [r.email], subject: campaign.subject, html }),
-        });
-        clearTimeout(timeout);
-        const text = await res.text();
-        if (res.ok) {
-          ok = true;
-          try { providerId = JSON.parse(text)?.id || null; } catch (_) {}
-        } else {
-          errMsg = `HTTP ${res.status}: ${text.slice(0, 500)}`;
-        }
-      }
-    } catch (e: any) {
-      errMsg = e?.name === "AbortError" ? "Timeout (15s)" : (e?.message || "Unknown error");
+    if (options.simulate) {
+      ok = true;
+      providerId = `simulated-${crypto.randomUUID()}`;
+    } else {
+      const result = await sendEmailWithFailover({
+        to: r.email,
+        toName: r.full_name,
+        subject: campaign.subject,
+        html,
+        preferredProvider: options.preferredProvider,
+      });
+      ok = result.ok;
+      providerId = result.id || null;
+      usedProvider = result.provider;
+      if (!ok) errMsg = result.error || "send failed";
     }
 
     if (ok) success++; else failure++;
