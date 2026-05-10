@@ -233,3 +233,7 @@ async function resolveSegment(supabase: any, segment: string): Promise<{ email: 
   }
   return Array.from(map.values());
 }
+
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
