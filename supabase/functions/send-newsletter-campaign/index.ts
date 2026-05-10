@@ -6,14 +6,12 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { brandedEmail } from "../_shared/email-template.ts";
+import { sendEmailWithFailover } from "../_shared/email-sender.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const GATEWAY_URL = "https://connector-gateway.lovable.dev/resend";
-const DEFAULT_FROM = Deno.env.get("NEWSLETTER_FROM") || "Legal Form <newsletter@legalform.ci>";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -23,24 +21,17 @@ serve(async (req) => {
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const authHeader = req.headers.get("Authorization") || req.headers.get("authorization") || "";
     const isServiceCaller = authHeader === `Bearer ${serviceKey}`;
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY_1") || Deno.env.get("RESEND_API_KEY");
-
-    if (!LOVABLE_API_KEY) return json({ error: "LOVABLE_API_KEY missing" }, 500);
-    if (!RESEND_API_KEY) return json({ error: "Resend connector not linked (RESEND_API_KEY_1 missing)" }, 500);
 
     const supabase = createClient(supabaseUrl, serviceKey);
 
     let body: any = {};
     try { body = await req.json(); } catch (_) { body = {}; }
-    const { campaignId, testEmail, mode, segment } = body;
+    const { campaignId, testEmail, mode, segment, preferredProvider } = body;
     const simulate = body?.simulate === true;
     if (simulate && !isServiceCaller) return json({ error: "Simulation réservée aux tests serveur" }, 403);
 
     if (mode === "cron") {
-      // 1) Recover stuck campaigns
       await supabase.rpc("reset_stuck_newsletter_campaigns");
-      // 2) Pick due scheduled campaigns
       let dueQuery = supabase
         .from("newsletter_campaigns")
         .select("id")
@@ -54,7 +45,7 @@ serve(async (req) => {
 
       const results: any[] = [];
       for (const c of due || []) {
-        const r = await sendCampaign(supabase, RESEND_API_KEY, LOVABLE_API_KEY, c.id, undefined, { simulate });
+        const r = await sendCampaign(supabase, c.id, undefined, { simulate, preferredProvider });
         results.push({ id: c.id, ...r });
       }
       return json({ processed: results.length, results });
@@ -62,7 +53,7 @@ serve(async (req) => {
 
     if (!campaignId) return json({ error: "campaignId required" }, 400);
 
-    const result = await sendCampaign(supabase, RESEND_API_KEY, LOVABLE_API_KEY, campaignId, testEmail, { segment });
+    const result = await sendCampaign(supabase, campaignId, testEmail, { segment, preferredProvider });
     return json(result);
   } catch (e: any) {
     console.error("send-newsletter-campaign error:", e);
@@ -78,18 +69,15 @@ function json(data: any, status = 200) {
 
 async function sendCampaign(
   supabase: any,
-  RESEND_API_KEY: string,
-  LOVABLE_API_KEY: string,
   campaignId: string,
   testEmail?: string,
-  options: { simulate?: boolean; segment?: string } = {},
+  options: { simulate?: boolean; segment?: string; preferredProvider?: "brevo" | "resend" } = {},
 ) {
   const { data: campaign, error: campErr } = await supabase
     .from("newsletter_campaigns").select("*").eq("id", campaignId).maybeSingle();
 
   if (campErr || !campaign) return { error: "Campaign not found", success: 0, failure: 0, total: 0 };
 
-  // Mark as sending (only if not already in-flight to avoid double-send)
   if (!testEmail) {
     if (campaign.status === "sent") {
       return { skipped: true, reason: "already sent", success: 0, failure: 0, total: 0 };
@@ -102,7 +90,6 @@ async function sendCampaign(
       .eq("id", campaignId);
   }
 
-  // Resolve recipients by segment
   let recipients: { email: string; full_name: string | null }[] = [];
   if (testEmail) {
     recipients = [{ email: testEmail, full_name: null }];
@@ -111,7 +98,6 @@ async function sendCampaign(
     recipients = await resolveSegment(supabase, segment);
   }
 
-  // Skip recipients already successfully sent for THIS campaign (retry-safety)
   let alreadySent = new Set<string>();
   if (!testEmail) {
     const { data: prior } = await supabase
@@ -135,8 +121,11 @@ async function sendCampaign(
     }
 
     const unsub = `https://www.legalform.ci/newsletter/unsubscribe?email=${encodeURIComponent(r.email)}`;
+    const greeting = r.full_name
+      ? `<p style="font-size:15px;color:#1f2937;margin:0 0 12px">Bonjour ${escapeHtml(r.full_name)},</p>`
+      : "";
     const html = brandedEmail({
-      bodyHtml: campaign.html_content,
+      bodyHtml: greeting + campaign.html_content,
       unsubscribeUrl: unsub,
       preheader: campaign.subject,
     });
@@ -144,35 +133,23 @@ async function sendCampaign(
     let providerId: string | null = null;
     let errMsg: string | null = null;
     let ok = false;
+    let usedProvider = "simulated";
 
-    try {
-      if (options.simulate) {
-        ok = true;
-        providerId = `simulated-${crypto.randomUUID()}`;
-      } else {
-        const ctrl = new AbortController();
-        const timeout = setTimeout(() => ctrl.abort(), 15000);
-        const res = await fetch(`${GATEWAY_URL}/emails`, {
-          method: "POST",
-          signal: ctrl.signal,
-          headers: {
-            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": RESEND_API_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ from: DEFAULT_FROM, to: [r.email], subject: campaign.subject, html }),
-        });
-        clearTimeout(timeout);
-        const text = await res.text();
-        if (res.ok) {
-          ok = true;
-          try { providerId = JSON.parse(text)?.id || null; } catch (_) {}
-        } else {
-          errMsg = `HTTP ${res.status}: ${text.slice(0, 500)}`;
-        }
-      }
-    } catch (e: any) {
-      errMsg = e?.name === "AbortError" ? "Timeout (15s)" : (e?.message || "Unknown error");
+    if (options.simulate) {
+      ok = true;
+      providerId = `simulated-${crypto.randomUUID()}`;
+    } else {
+      const result = await sendEmailWithFailover({
+        to: r.email,
+        toName: r.full_name,
+        subject: campaign.subject,
+        html,
+        preferredProvider: options.preferredProvider,
+      });
+      ok = result.ok;
+      providerId = result.id || null;
+      usedProvider = result.provider;
+      if (!ok) errMsg = result.error || "send failed";
     }
 
     if (ok) success++; else failure++;
@@ -183,7 +160,7 @@ async function sendCampaign(
         recipient_email: r.email,
         status: ok ? "success" : "failed",
         provider_message_id: providerId,
-        error_message: errMsg,
+        error_message: ok ? `via:${usedProvider}` : `${usedProvider}: ${errMsg}`,
       });
     }
     await new Promise((r) => setTimeout(r, 50));
@@ -255,4 +232,8 @@ async function resolveSegment(supabase: any, segment: string): Promise<{ email: 
     (data || []).forEach((r: any) => add(r.email, r.full_name));
   }
   return Array.from(map.values());
+}
+
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
