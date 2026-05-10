@@ -1,32 +1,30 @@
-// Send a branded welcome email when someone subscribes to the newsletter
+// Send a branded welcome email when someone subscribes — multi-provider with failover.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { brandedEmail } from "../_shared/email-template.ts";
+import { sendEmailWithFailover } from "../_shared/email-sender.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const FROM = Deno.env.get("NEWSLETTER_FROM") || "LegalForm <newsletter@legalform.ci>";
-
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
     const { email, fullName } = await req.json();
-    if (!email) return json({ error: "email required" }, 400);
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      return json({ error: "valid email required" }, 400);
+    }
 
-    const RESEND_API_KEY =
-      Deno.env.get("RESEND_API_KEY") ||
-      Deno.env.get("Resend_LegalForm_domaine_API") ||
-      Deno.env.get("RESEND_API_KEY_1");
-    if (!RESEND_API_KEY) return json({ error: "RESEND_API_KEY missing" }, 500);
+    const greeting = fullName
+      ? `Bonjour ${escapeHtml(fullName)} 👋`
+      : "Bienvenue chez LegalForm 👋";
 
     const unsub = `https://www.legalform.ci/newsletter/unsubscribe?email=${encodeURIComponent(email)}`;
-    const greeting = fullName ? `Bonjour ${escapeHtml(fullName)} 👋` : "Bienvenue chez LegalForm 👋";
     const body = `
       <h2 style="color:#0f766e;margin:0 0 16px;font-size:24px">${greeting}</h2>
       <p style="font-size:16px;line-height:1.6;color:#1f2937;margin:0 0 16px">
-        Merci de rejoindre la communauté <strong>LegalForm</strong>, la plateforme N°1 pour
+        Merci de rejoindre la communauté <strong>LegalForm</strong> — la plateforme N°1 pour
         créer et gérer votre entreprise en Côte d'Ivoire.
       </p>
       <p style="font-size:15px;line-height:1.6;color:#1f2937;margin:0 0 16px">
@@ -51,26 +49,18 @@ serve(async (req) => {
       preheader: "Bienvenue chez LegalForm — vos guides et actus juridiques arrivent !",
     });
 
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: FROM,
-        to: [email],
-        subject: "Bienvenue chez LegalForm 🎉",
-        html,
-      }),
+    const result = await sendEmailWithFailover({
+      to: email,
+      toName: fullName || null,
+      subject: "Bienvenue chez LegalForm 🎉",
+      html,
     });
 
-    const text = await res.text();
-    if (!res.ok) {
-      console.error("Resend welcome failed:", res.status, text);
-      return json({ error: `Resend ${res.status}: ${text.slice(0, 300)}` }, 500);
+    if (!result.ok) {
+      console.error("welcome send failed:", result);
+      return json({ error: result.error, attempts: result.attempts }, 500);
     }
-    return json({ ok: true, id: safeJson(text)?.id });
+    return json({ ok: true, provider: result.provider, id: result.id, attempts: result.attempts });
   } catch (e: any) {
     console.error("send-newsletter-welcome error:", e);
     return json({ error: e.message }, 500);
@@ -78,7 +68,11 @@ serve(async (req) => {
 });
 
 function json(d: any, s = 200) {
-  return new Response(JSON.stringify(d), { status: s, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+  return new Response(JSON.stringify(d), {
+    status: s,
+    headers: { ...corsHeaders, "Content-Type": "application/json" },
+  });
 }
-function safeJson(s: string) { try { return JSON.parse(s); } catch { return null; } }
-function escapeHtml(s: string) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+function escapeHtml(s: string) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
