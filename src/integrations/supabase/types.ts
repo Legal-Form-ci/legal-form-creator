@@ -833,6 +833,60 @@ export type Database = {
         }
         Relationships: []
       }
+      newsletter_automations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          day_of_week: number | null
+          frequency: string
+          id: string
+          is_active: boolean
+          is_test_mode: boolean
+          last_dispatched_id: string | null
+          last_run_at: string | null
+          name: string
+          segment: string
+          source_type: string
+          test_email: string | null
+          time_of_day: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          day_of_week?: number | null
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          is_test_mode?: boolean
+          last_dispatched_id?: string | null
+          last_run_at?: string | null
+          name: string
+          segment?: string
+          source_type: string
+          test_email?: string | null
+          time_of_day?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          day_of_week?: number | null
+          frequency?: string
+          id?: string
+          is_active?: boolean
+          is_test_mode?: boolean
+          last_dispatched_id?: string | null
+          last_run_at?: string | null
+          name?: string
+          segment?: string
+          source_type?: string
+          test_email?: string | null
+          time_of_day?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_campaigns: {
         Row: {
           created_at: string
