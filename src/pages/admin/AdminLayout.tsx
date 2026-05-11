@@ -120,6 +120,7 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
         { label: "Newsletter — Abonnés", href: "/admin/newsletter", icon: Newspaper },
         { label: "Newsletter — Composer", href: "/admin/newsletter/compose", icon: Newspaper },
         { label: "Newsletter — Journal", href: "/admin/newsletter/logs", icon: Newspaper },
+        { label: "Newsletter — Automatisations", href: "/admin/newsletter/automations", icon: Newspaper },
         { label: "Forum", href: "/admin/forum", icon: MessagesSquare },
         { label: "Témoignages", href: "/admin/testimonials", icon: Star },
         { label: "Réalisations", href: "/admin/showcase", icon: Trophy },
