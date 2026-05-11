@@ -177,6 +177,14 @@
   .shadow-strong {
     box-shadow: var(--shadow-strong);
   }
+
+  .shadow-premium {
+    box-shadow: var(--shadow-premium);
+  }
+
+  .bg-gradient-primary {
+    background: var(--gradient-primary);
+  }
   
   /* Number formatting with thousand separators */
   .number-format {
