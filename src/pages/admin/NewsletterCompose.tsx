@@ -11,8 +11,9 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users } from "lucide-react";
+import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users, Image as ImageIcon, Paperclip, Zap, Copy, Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useRef } from "react";
 
 
 interface Campaign {
