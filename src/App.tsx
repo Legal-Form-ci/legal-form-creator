@@ -71,6 +71,7 @@ import SearchResults from "./pages/SearchResults";
 import PageContentsAdmin from "./pages/admin/PageContentsAdmin";
 import NewsletterCompose from "./pages/admin/NewsletterCompose";
 import NewsletterLogs from "./pages/admin/NewsletterLogs";
+import NewsletterAutomations from "./pages/admin/NewsletterAutomations";
 import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
 
 const queryClient = new QueryClient();
@@ -162,6 +163,7 @@ const App = () => (
           <Route path="/admin/newsletter/compose" element={<NewsletterCompose />} />
           <Route path="/admin/newsletter/logs" element={<NewsletterLogs />} />
           <Route path="/admin/newsletter/logs/:campaignId" element={<NewsletterLogs />} />
+          <Route path="/admin/newsletter/automations" element={<NewsletterAutomations />} />
           <Route path="/newsletter/unsubscribe" element={<NewsletterUnsubscribe />} />
           <Route path="/admin/database" element={<DatabaseManager />} />
           <Route path="/admin/referral-withdrawals" element={<ReferralWithdrawals />} />
