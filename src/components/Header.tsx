@@ -199,20 +199,22 @@ const Header = () => {
 
             {user ? (
               <Link to={userRole === "admin" ? "/admin/dashboard" : "/client/dashboard"}>
-                <Button variant="outline" className="font-semibold">
+                <Button className="rounded-full bg-gradient-primary hover:opacity-95 text-white font-semibold px-5 shadow-premium hover:shadow-strong transition-all">
                   {t("nav.mySpace")}
                 </Button>
               </Link>
             ) : (
               <Link to="/auth">
-                <Button variant="outline" className="font-semibold">
+                <Button className="rounded-full bg-gradient-primary hover:opacity-95 text-white font-semibold px-5 shadow-premium hover:shadow-strong transition-all">
                   <LogIn className="mr-2 h-4 w-4" />
                   {t("nav.login")}
                 </Button>
               </Link>
             )}
             <Link to="/create">
-              <Button className="bg-gradient-accent hover:opacity-90 shadow-soft font-semibold">{t("nav.createCompany")}</Button>
+              <Button variant="outline" className="rounded-full border-2 border-accent text-accent hover:bg-accent hover:text-white font-semibold px-5 transition-all">
+                {t("nav.createCompany")}
+              </Button>
             </Link>
           </div>
 
