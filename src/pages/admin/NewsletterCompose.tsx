@@ -191,9 +191,14 @@ const NewsletterCompose = () => {
             </h1>
             <p className="text-muted-foreground">Newsletters, annonces et messages ciblés — assisté par IA.</p>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/admin/newsletter/logs"><ScrollText className="h-4 w-4 mr-1" /> Journal des envois</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/newsletter/logs"><ScrollText className="h-4 w-4 mr-1" /> Journal des envois</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/admin/newsletter/automations"><Zap className="h-4 w-4 mr-1" /> Automatisations</Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-4">
@@ -246,6 +251,7 @@ const NewsletterCompose = () => {
 
                 <div className="space-y-2">
                   <Label>Contenu de l'email (modifiable)</Label>
+                  <UploadToolbar onInsert={(snippet) => setHtml(html + "\n" + snippet)} />
                   <WysiwygEditor value={html} onChange={setHtml} className="rounded-md border" />
                   <details className="text-xs text-muted-foreground">
                     <summary className="cursor-pointer">Éditer le HTML brut (avancé)</summary>
