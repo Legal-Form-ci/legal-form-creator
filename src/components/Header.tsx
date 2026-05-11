@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Menu, X, LogIn, Search, ChevronDown, Briefcase, Newspaper, LifeBuoy, Users, MessageSquare, BookOpen, Star, Building2, CircleDollarSign } from "lucide-react";
+import { Menu, X, LogIn, Search, ChevronDown, Briefcase, Newspaper, LifeBuoy, Users, MessageSquare, BookOpen, Star, Building2, CircleDollarSign, Phone, Mail, MapPin, Facebook, Linkedin, Instagram } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -151,6 +151,29 @@ const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-md border-b border-border shadow-soft">
+      {/* Top-bar fine inspirée Belife */}
+      <div className="hidden lg:block bg-gradient-primary text-white text-xs">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-9">
+          <div className="flex items-center gap-5 opacity-95">
+            <a href="tel:+2250707070707" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+              <Phone className="h-3.5 w-3.5" /> +225 07 07 07 07 07
+            </a>
+            <a href="mailto:contact@legalform.ci" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+              <Mail className="h-3.5 w-3.5" /> contact@legalform.ci
+            </a>
+            <Link to="/regions" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+              <MapPin className="h-3.5 w-3.5" /> Agences & contact
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link to="/tracking" className="hover:opacity-80 transition-opacity">Suivre mon dossier</Link>
+            <span className="opacity-40">|</span>
+            <a href="#" aria-label="Facebook" className="hover:opacity-80"><Facebook className="h-3.5 w-3.5" /></a>
+            <a href="#" aria-label="LinkedIn" className="hover:opacity-80"><Linkedin className="h-3.5 w-3.5" /></a>
+            <a href="#" aria-label="Instagram" className="hover:opacity-80"><Instagram className="h-3.5 w-3.5" /></a>
+          </div>
+        </div>
+      </div>
       <nav className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           <Link to="/" className="flex items-center space-x-2 lg:space-x-3 group flex-shrink-0">
