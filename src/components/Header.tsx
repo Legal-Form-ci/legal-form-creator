@@ -267,20 +267,20 @@ const Header = () => {
             <div className="pt-4 px-4 space-y-2">
               {user ? (
                 <Link to={userRole === "admin" ? "/admin/dashboard" : "/client/dashboard"} onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full font-semibold">
+                  <Button className="w-full rounded-full bg-gradient-primary text-white font-semibold shadow-premium">
                     {t("nav.mySpace")}
                   </Button>
                 </Link>
               ) : (
                 <Link to="/auth" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full font-semibold">
+                  <Button className="w-full rounded-full bg-gradient-primary text-white font-semibold shadow-premium">
                     <LogIn className="mr-2 h-4 w-4" />
                     {t("nav.login")}
                   </Button>
                 </Link>
               )}
               <Link to="/create" onClick={() => setIsOpen(false)}>
-                <Button className="w-full bg-gradient-accent hover:opacity-90 shadow-soft font-semibold">
+                <Button variant="outline" className="w-full rounded-full border-2 border-accent text-accent hover:bg-accent hover:text-white font-semibold">
                   {t("nav.createCompany")}
                 </Button>
               </Link>
