@@ -333,7 +333,15 @@ const NewsletterCompose = () => {
                 <div className="border-t pt-4 space-y-2">
                   <Label>Email de test</Label>
                   <div className="grid gap-2 sm:flex">
-                    <Input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="vous@exemple.com" />
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        value={testEmail}
+                        onChange={(e) => { setTestEmail(e.target.value); if (errors.testEmail) setErrors({ ...errors, testEmail: "" }); }}
+                        placeholder="vous@exemple.com"
+                        className={errors.testEmail ? "border-destructive focus-visible:ring-destructive" : ""}
+                      />
+                      {errors.testEmail && <p className="text-xs text-destructive">{errors.testEmail}</p>}
+                    </div>
                     <Button onClick={() => sendNow(undefined, true)} variant="secondary" disabled={loading || !editingId} className="w-full sm:w-auto">
                       Envoyer test
                     </Button>
