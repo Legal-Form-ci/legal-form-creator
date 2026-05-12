@@ -1,6 +1,10 @@
 // Shared branded HTML wrapper for all outgoing LegalForm emails
-const LOGO_URL = "https://www.legalform.ci/logo.png";
-const SITE = "https://www.legalform.ci";
+// Logo URL is configurable via EMAIL_LOGO_URL secret (recommended: a public Supabase storage URL).
+// Fallback uses the Lovable published URL where /logo.png is served from public/.
+const LOGO_URL =
+  Deno.env.get("EMAIL_LOGO_URL") ||
+  "https://doc-duplicator-wiz.lovable.app/logo.png";
+const SITE = Deno.env.get("EMAIL_SITE_URL") || "https://www.legalform.ci";
 
 export function brandedEmail(opts: {
   bodyHtml: string;
@@ -22,8 +26,9 @@ export function brandedEmail(opts: {
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
         <tr>
           <td style="background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%);padding:28px 32px;text-align:center">
-            <a href="${SITE}" style="text-decoration:none">
-              <img src="${LOGO_URL}" alt="LegalForm" width="140" style="display:inline-block;max-width:140px;height:auto" />
+            <a href="${SITE}" style="text-decoration:none;color:#ffffff">
+              <img src="${LOGO_URL}" alt="LegalForm" width="140" style="display:inline-block;max-width:140px;height:auto;border:0;outline:none" />
+              <div style="margin-top:8px;font-family:Inter,Arial,sans-serif;color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px">Legal Form</div>
             </a>
           </td>
         </tr>
