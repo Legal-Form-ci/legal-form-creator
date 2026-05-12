@@ -250,9 +250,16 @@ const NewsletterCompose = () => {
                 <CardDescription>L'email sera enrobé automatiquement (logo, header, footer, désinscription).</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Sujet de l'email</Label>
-                  <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Newsletter LegalForm – Mai 2026" />
+                <div className="space-y-1.5">
+                  <Label>Sujet de l'email <span className="text-destructive">*</span></Label>
+                  <Input
+                    value={subject}
+                    onChange={(e) => { setSubject(e.target.value); if (errors.subject) setErrors({ ...errors, subject: "" }); }}
+                    placeholder="Newsletter LegalForm – Mai 2026"
+                    className={errors.subject ? "border-destructive focus-visible:ring-destructive" : ""}
+                    aria-invalid={!!errors.subject}
+                  />
+                  {errors.subject && <p className="text-xs text-destructive">{errors.subject}</p>}
                 </div>
 
                 <div className="space-y-2 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent p-4">
@@ -270,10 +277,13 @@ const NewsletterCompose = () => {
                   </Button>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Contenu de l'email (modifiable)</Label>
-                  <UploadToolbar onInsert={(snippet) => setHtml(html + "\n" + snippet)} />
-                  <WysiwygEditor value={html} onChange={setHtml} className="rounded-md border" />
+                <div className="space-y-1.5">
+                  <Label>Contenu de l'email <span className="text-destructive">*</span></Label>
+                  <UploadToolbar onInsert={(snippet) => { setHtml(html + "\n" + snippet); if (errors.html) setErrors({ ...errors, html: "" }); }} />
+                  <div className={errors.html ? "rounded-md ring-2 ring-destructive" : ""}>
+                    <WysiwygEditor value={html} onChange={(v) => { setHtml(v); if (errors.html) setErrors({ ...errors, html: "" }); }} className="rounded-md border" />
+                  </div>
+                  {errors.html && <p className="text-xs text-destructive">{errors.html}</p>}
                   <details className="text-xs text-muted-foreground">
                     <summary className="cursor-pointer">Éditer le HTML brut (avancé)</summary>
                     <Textarea value={html} onChange={(e) => setHtml(e.target.value)} rows={8} className="font-mono text-xs mt-2" />
@@ -294,9 +304,15 @@ const NewsletterCompose = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Planifier (optionnel)</Label>
-                    <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+                    <Input
+                      type="datetime-local"
+                      value={scheduledAt}
+                      onChange={(e) => { setScheduledAt(e.target.value); if (errors.scheduledAt) setErrors({ ...errors, scheduledAt: "" }); }}
+                      className={errors.scheduledAt ? "border-destructive focus-visible:ring-destructive" : ""}
+                    />
+                    {errors.scheduledAt && <p className="text-xs text-destructive">{errors.scheduledAt}</p>}
                   </div>
                 </div>
 
