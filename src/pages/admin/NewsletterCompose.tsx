@@ -51,6 +51,26 @@ const NewsletterCompose = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [segment, setSegment] = useState("subscribers");
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validate = (opts: { requireSchedule?: boolean; requireTestEmail?: boolean } = {}): boolean => {
+    const e: Record<string, string> = {};
+    if (!subject.trim()) e.subject = "Le sujet est obligatoire";
+    else if (subject.trim().length < 5) e.subject = "Au moins 5 caractères";
+    else if (subject.length > 150) e.subject = "150 caractères maximum";
+    const text = html.replace(/<[^>]+>/g, "").trim();
+    if (!html.trim()) e.html = "Le contenu est obligatoire";
+    else if (text.length < 20) e.html = "Le contenu est trop court (min. 20 caractères de texte)";
+    if (opts.requireSchedule && !scheduledAt) e.scheduledAt = "Choisissez une date/heure de planification";
+    if (opts.requireSchedule && scheduledAt && new Date(scheduledAt) < new Date()) e.scheduledAt = "La date doit être dans le futur";
+    if (opts.requireTestEmail) {
+      if (!testEmail.trim()) e.testEmail = "Email de test obligatoire";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail)) e.testEmail = "Email invalide";
+    }
+    if (!segment) e.segment = "Sélectionnez un segment";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const load = async () => {
     const [{ data: list }, subs, requesters, intern, users] = await Promise.all([
@@ -101,8 +121,8 @@ const NewsletterCompose = () => {
   };
 
   const save = async (asScheduled = false) => {
-    if (!subject.trim() || !html.trim()) {
-      toast({ title: "Champs requis", description: "Sujet et contenu sont requis.", variant: "destructive" });
+    if (!validate({ requireSchedule: asScheduled })) {
+      toast({ title: "Champs invalides", description: "Corrigez les erreurs en rouge avant de continuer.", variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -134,8 +154,8 @@ const NewsletterCompose = () => {
       toast({ title: "Enregistrez d'abord la campagne", variant: "destructive" });
       return;
     }
-    if (isTest && !testEmail) {
-      toast({ title: "Indiquez un email de test", variant: "destructive" });
+    if (!validate({ requireTestEmail: isTest })) {
+      toast({ title: "Champs invalides", description: "Corrigez les erreurs en rouge.", variant: "destructive" });
       return;
     }
     const segLabel = SEGMENTS.find((s) => s.value === segment)?.label;
@@ -230,9 +250,16 @@ const NewsletterCompose = () => {
                 <CardDescription>L'email sera enrobé automatiquement (logo, header, footer, désinscription).</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label>Sujet de l'email</Label>
-                  <Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Newsletter LegalForm – Mai 2026" />
+                <div className="space-y-1.5">
+                  <Label>Sujet de l'email <span className="text-destructive">*</span></Label>
+                  <Input
+                    value={subject}
+                    onChange={(e) => { setSubject(e.target.value); if (errors.subject) setErrors({ ...errors, subject: "" }); }}
+                    placeholder="Newsletter LegalForm – Mai 2026"
+                    className={errors.subject ? "border-destructive focus-visible:ring-destructive" : ""}
+                    aria-invalid={!!errors.subject}
+                  />
+                  {errors.subject && <p className="text-xs text-destructive">{errors.subject}</p>}
                 </div>
 
                 <div className="space-y-2 rounded-lg border bg-gradient-to-br from-primary/5 to-transparent p-4">
@@ -250,10 +277,13 @@ const NewsletterCompose = () => {
                   </Button>
                 </div>
 
-                <div className="space-y-2">
-                  <Label>Contenu de l'email (modifiable)</Label>
-                  <UploadToolbar onInsert={(snippet) => setHtml(html + "\n" + snippet)} />
-                  <WysiwygEditor value={html} onChange={setHtml} className="rounded-md border" />
+                <div className="space-y-1.5">
+                  <Label>Contenu de l'email <span className="text-destructive">*</span></Label>
+                  <UploadToolbar onInsert={(snippet) => { setHtml(html + "\n" + snippet); if (errors.html) setErrors({ ...errors, html: "" }); }} />
+                  <div className={errors.html ? "rounded-md ring-2 ring-destructive" : ""}>
+                    <WysiwygEditor value={html} onChange={(v) => { setHtml(v); if (errors.html) setErrors({ ...errors, html: "" }); }} className="rounded-md border" />
+                  </div>
+                  {errors.html && <p className="text-xs text-destructive">{errors.html}</p>}
                   <details className="text-xs text-muted-foreground">
                     <summary className="cursor-pointer">Éditer le HTML brut (avancé)</summary>
                     <Textarea value={html} onChange={(e) => setHtml(e.target.value)} rows={8} className="font-mono text-xs mt-2" />
@@ -274,9 +304,15 @@ const NewsletterCompose = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
+                  <div className="space-y-1.5">
                     <Label className="flex items-center gap-2"><Calendar className="h-4 w-4" /> Planifier (optionnel)</Label>
-                    <Input type="datetime-local" value={scheduledAt} onChange={(e) => setScheduledAt(e.target.value)} />
+                    <Input
+                      type="datetime-local"
+                      value={scheduledAt}
+                      onChange={(e) => { setScheduledAt(e.target.value); if (errors.scheduledAt) setErrors({ ...errors, scheduledAt: "" }); }}
+                      className={errors.scheduledAt ? "border-destructive focus-visible:ring-destructive" : ""}
+                    />
+                    {errors.scheduledAt && <p className="text-xs text-destructive">{errors.scheduledAt}</p>}
                   </div>
                 </div>
 
@@ -297,7 +333,15 @@ const NewsletterCompose = () => {
                 <div className="border-t pt-4 space-y-2">
                   <Label>Email de test</Label>
                   <div className="grid gap-2 sm:flex">
-                    <Input value={testEmail} onChange={(e) => setTestEmail(e.target.value)} placeholder="vous@exemple.com" />
+                    <div className="flex-1 space-y-1">
+                      <Input
+                        value={testEmail}
+                        onChange={(e) => { setTestEmail(e.target.value); if (errors.testEmail) setErrors({ ...errors, testEmail: "" }); }}
+                        placeholder="vous@exemple.com"
+                        className={errors.testEmail ? "border-destructive focus-visible:ring-destructive" : ""}
+                      />
+                      {errors.testEmail && <p className="text-xs text-destructive">{errors.testEmail}</p>}
+                    </div>
                     <Button onClick={() => sendNow(undefined, true)} variant="secondary" disabled={loading || !editingId} className="w-full sm:w-auto">
                       Envoyer test
                     </Button>
