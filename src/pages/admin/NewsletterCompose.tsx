@@ -51,6 +51,26 @@ const NewsletterCompose = () => {
   const [aiPrompt, setAiPrompt] = useState("");
   const [segment, setSegment] = useState("subscribers");
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validate = (opts: { requireSchedule?: boolean; requireTestEmail?: boolean } = {}): boolean => {
+    const e: Record<string, string> = {};
+    if (!subject.trim()) e.subject = "Le sujet est obligatoire";
+    else if (subject.trim().length < 5) e.subject = "Au moins 5 caractères";
+    else if (subject.length > 150) e.subject = "150 caractères maximum";
+    const text = html.replace(/<[^>]+>/g, "").trim();
+    if (!html.trim()) e.html = "Le contenu est obligatoire";
+    else if (text.length < 20) e.html = "Le contenu est trop court (min. 20 caractères de texte)";
+    if (opts.requireSchedule && !scheduledAt) e.scheduledAt = "Choisissez une date/heure de planification";
+    if (opts.requireSchedule && scheduledAt && new Date(scheduledAt) < new Date()) e.scheduledAt = "La date doit être dans le futur";
+    if (opts.requireTestEmail) {
+      if (!testEmail.trim()) e.testEmail = "Email de test obligatoire";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail)) e.testEmail = "Email invalide";
+    }
+    if (!segment) e.segment = "Sélectionnez un segment";
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
 
   const load = async () => {
     const [{ data: list }, subs, requesters, intern, users] = await Promise.all([
@@ -101,8 +121,8 @@ const NewsletterCompose = () => {
   };
 
   const save = async (asScheduled = false) => {
-    if (!subject.trim() || !html.trim()) {
-      toast({ title: "Champs requis", description: "Sujet et contenu sont requis.", variant: "destructive" });
+    if (!validate({ requireSchedule: asScheduled })) {
+      toast({ title: "Champs invalides", description: "Corrigez les erreurs en rouge avant de continuer.", variant: "destructive" });
       return;
     }
     setLoading(true);
@@ -134,8 +154,8 @@ const NewsletterCompose = () => {
       toast({ title: "Enregistrez d'abord la campagne", variant: "destructive" });
       return;
     }
-    if (isTest && !testEmail) {
-      toast({ title: "Indiquez un email de test", variant: "destructive" });
+    if (!validate({ requireTestEmail: isTest })) {
+      toast({ title: "Champs invalides", description: "Corrigez les erreurs en rouge.", variant: "destructive" });
       return;
     }
     const segLabel = SEGMENTS.find((s) => s.value === segment)?.label;
