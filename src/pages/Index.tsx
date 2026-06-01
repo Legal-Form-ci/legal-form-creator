@@ -120,7 +120,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section - Split Layout */}
-      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+      <section className="relative pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-40 lg:pb-32 overflow-hidden">
         <div 
           className="absolute inset-0 bg-gradient-hero"
           style={{
@@ -180,15 +180,35 @@ const Index = () => {
                   </Button>
                 </Link>
               </div>
+
+              {/* Mobile-only: Actualités juste sous les CTAs */}
+              <div className="lg:hidden mt-8 bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                <NewsSection />
+              </div>
+
+              {/* Mobile-only: Avantages compacts */}
+              <div className="lg:hidden grid grid-cols-2 gap-3 mt-4">
+                {advantages.map((adv, i) => {
+                  const Icon = adv.icon;
+                  return (
+                    <div key={i} className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2.5 border border-white/20 flex items-center gap-2">
+                      <Icon className="h-4 w-4 text-accent flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-white font-semibold text-xs truncate">{adv.title}</p>
+                        <p className="text-white/70 text-[10px] truncate">{adv.desc}</p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-            
-            {/* Right side - News Section + Advantages */}
-            <div className="lg:col-span-2 space-y-6 animate-in fade-in slide-in-from-right-4 duration-1000 delay-300">
+
+            {/* Desktop-only right column: News + Advantages */}
+            <div className="hidden lg:block lg:col-span-2 space-y-6 animate-in fade-in slide-in-from-right-4 duration-1000 delay-300">
               <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
                 <NewsSection />
               </div>
-              
-              {/* Advantages - moved here from below CTA buttons */}
+
               <div className="grid grid-cols-2 gap-3">
                 {advantages.map((adv, i) => {
                   const Icon = adv.icon;
@@ -204,6 +224,7 @@ const Index = () => {
                 })}
               </div>
             </div>
+
           </div>
         </div>
       </section>
