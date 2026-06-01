@@ -1,30 +1,32 @@
-import { Building2, Users, FileText, Briefcase, ShieldCheck, Landmark, GraduationCap, ArrowRight } from "lucide-react";
+import { Building2, Users, FileText, Briefcase, ShieldCheck, Landmark, GraduationCap, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 const Services = () => {
   const companyTypes = [
-    { name: "SARL", description: "Société à Responsabilité Limitée", details: "Structure flexible pour PME avec responsabilité limitée des associés" },
-    { name: "SUARL", description: "Société Unipersonnelle à Responsabilité Limitée", details: "SARL avec un seul associé, idéale pour entrepreneurs solo" },
-    { name: "SNC", description: "Société en Nom Collectif", details: "Tous les associés ont la qualité de commerçant" },
-    { name: "SCS", description: "Société en Commandite Simple", details: "Associés commanditaires et commandités avec statuts différents" },
-    { name: "Entreprise Individuelle", description: "Pour exercer seul une activité", details: "Structure simple sans création de personne morale distincte" },
+    { name: "SARL", description: "Société à Responsabilité Limitée", details: "Structure flexible pour PME avec responsabilité limitée des associés.", tag: "Le plus demandé" },
+    { name: "SUARL", description: "SARL Unipersonnelle", details: "Idéale pour les entrepreneurs solo souhaitant protéger leur patrimoine." },
+    { name: "SNC", description: "Société en Nom Collectif", details: "Tous les associés ont la qualité de commerçant." },
+    { name: "SCS", description: "Société en Commandite Simple", details: "Associés commanditaires et commandités avec statuts différents." },
+    { name: "Entreprise Individuelle", description: "Activité en nom propre", details: "Structure simple, sans personne morale distincte." },
+    { name: "SAS / SA", description: "Société par Actions", details: "Pour les projets ambitieux avec investisseurs et gouvernance avancée." },
   ];
 
   const otherStructures = [
-    { icon: Users, title: "Association", description: "Création et enregistrement d'associations à but non lucratif" },
-    { icon: Landmark, title: "ONG", description: "Organisation Non Gouvernementale pour projets de développement" },
-    { icon: Briefcase, title: "Coopérative", description: "Structure de collaboration économique entre membres" },
-    { icon: Building2, title: "GIE", description: "Groupement d'Intérêt Économique pour actions communes" },
+    { icon: Users, title: "Association", description: "Création et enregistrement d'associations à but non lucratif." },
+    { icon: Landmark, title: "ONG", description: "Organisation Non Gouvernementale pour projets de développement." },
+    { icon: Briefcase, title: "Coopérative", description: "Structure de collaboration économique entre membres." },
+    { icon: Building2, title: "GIE", description: "Groupement d'Intérêt Économique pour actions communes." },
   ];
 
   const legalDocuments = [
-    "Rédaction de statuts", "Modification de statuts", "Contrat de bail commercial enregistré",
-    "Contrat de travail (CDI, CDD)", "Convention de partenariat", "Procurations et mandats",
-    "Actes de cession de parts", "Protocoles d'accord", "Déclaration de Souscription et de Versement (DSV)",
+    "Rédaction de statuts", "Modification de statuts", "Bail commercial enregistré",
+    "Contrats de travail (CDI, CDD)", "Convention de partenariat", "Procurations et mandats",
+    "Actes de cession de parts", "Protocoles d'accord", "Déclaration de Souscription (DSV)",
   ];
 
   const complementaryServices = [
@@ -34,39 +36,69 @@ const Services = () => {
     { title: "Immatriculation CNPS", description: "Caisse Nationale de Prévoyance Sociale" },
     { title: "IDU", description: "Identification Unique de l'entreprise" },
     { title: "NTD", description: "Numéro de Télédéclarant fiscal" },
-    { title: "Avis de constitution", description: "Publication officielle" },
+    { title: "Avis de constitution", description: "Publication légale officielle" },
     { title: "Domiciliation", description: "Adresse commerciale et siège social" },
+  ];
+
+  const additional = [
+    { icon: FileText, title: "Structuration de projet", desc: "Business plan, études de faisabilité et conseil stratégique." },
+    { icon: GraduationCap, title: "Formation", desc: "Formations entrepreneuriales et coaching personnalisé." },
+    { icon: Briefcase, title: "Mobilisation de financement", desc: "Recherche et montage de dossiers de financement." },
+    { icon: Building2, title: "Solutions digitales", desc: "Sites web, applications et outils sur mesure." },
+    { icon: FileText, title: "Identité visuelle", desc: "Logos, chartes graphiques et supports de communication." },
+    { icon: Briefcase, title: "Comptabilité & fiscalité", desc: "Tenue, déclarations et conseil en gestion." },
   ];
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="pt-32 pb-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero */}
-          <div className="text-center mb-16">
-            <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-foreground mb-6">Nos Services</h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Créer, gérer et accompagner votre entreprise en Côte d'Ivoire et partout dans le monde
-            </p>
-          </div>
 
-          {/* Company Types */}
-          <section className="mb-20">
-            <div className="flex items-center mb-8">
-              <Building2 className="h-8 w-8 text-primary mr-3" />
-              <h2 className="font-heading font-bold text-3xl text-foreground">Création d'Entreprise</h2>
+      <main>
+        {/* HERO */}
+        <section className="relative overflow-hidden bg-gradient-hero text-white pt-32 pb-20 lg:pt-44 lg:pb-28">
+          <div className="absolute inset-0 opacity-15 pointer-events-none" style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="max-w-3xl">
+              <Badge className="bg-white/15 text-white border-white/20 backdrop-blur mb-5">Nos services</Badge>
+              <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl leading-tight mb-6">
+                Tout ce qu'il faut pour créer et faire grandir votre entreprise
+              </h1>
+              <p className="text-lg sm:text-xl text-white/85 leading-relaxed mb-8">
+                Création de société, formalités, documents juridiques, financement, digital — sous un seul guichet.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link to="/create"><Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold">Démarrer ma demande <ArrowRight className="ml-2 h-5 w-5" /></Button></Link>
+                <Link to="/pricing"><Button size="lg" variant="outline" className="bg-white/10 border-white/40 text-white hover:bg-white hover:text-primary">Voir les tarifs</Button></Link>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {companyTypes.map((type, index) => (
-                <Card key={index} className="hover:shadow-strong transition-all hover:border-primary">
+          </div>
+        </section>
+
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 space-y-20 lg:space-y-28">
+          {/* Company Types */}
+          <section>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2.5 rounded-xl bg-primary/10"><Building2 className="h-6 w-6 text-primary" /></div>
+              <div>
+                <Badge variant="secondary" className="mb-2">Création d'entreprise</Badge>
+                <h2 className="font-heading font-bold text-3xl text-foreground">Choisissez votre forme juridique</h2>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {companyTypes.map((type) => (
+                <Card key={type.name} className="group border-2 hover:border-primary hover:shadow-strong hover:-translate-y-1 transition-all">
                   <CardHeader>
-                    <CardTitle className="text-primary">{type.name}</CardTitle>
+                    <div className="flex items-start justify-between">
+                      <CardTitle className="text-primary text-2xl">{type.name}</CardTitle>
+                      {type.tag && <Badge className="bg-accent/15 text-accent border-accent/30">{type.tag}</Badge>}
+                    </div>
                     <CardDescription className="font-semibold text-foreground">{type.description}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">{type.details}</p>
+                    <p className="text-sm text-muted-foreground mb-4">{type.details}</p>
+                    <Link to="/create" className="text-sm text-primary font-semibold inline-flex items-center group-hover:gap-2 gap-1 transition-all">
+                      Lancer la création <ArrowRight className="h-4 w-4" />
+                    </Link>
                   </CardContent>
                 </Card>
               ))}
@@ -74,21 +106,24 @@ const Services = () => {
           </section>
 
           {/* Other Structures */}
-          <section className="mb-20">
-            <h2 className="font-heading font-bold text-3xl text-foreground mb-8">Autres Structures</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {otherStructures.map((structure, index) => {
-                const Icon = structure.icon;
+          <section>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <Badge variant="secondary" className="mb-3">Autres structures</Badge>
+              <h2 className="font-heading font-bold text-3xl text-foreground">Associations, ONG, coopératives & GIE</h2>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              {otherStructures.map((s) => {
+                const Icon = s.icon;
                 return (
-                  <Card key={index} className="hover:shadow-strong transition-all hover:border-primary text-center">
+                  <Card key={s.title} className="group text-center border-2 hover:border-primary hover:shadow-strong hover:-translate-y-1 transition-all">
                     <CardHeader>
-                      <div className="mx-auto mb-3 p-3 rounded-xl bg-primary/10 w-fit">
-                        <Icon className="h-8 w-8 text-primary" />
+                      <div className="mx-auto p-3 rounded-xl bg-primary/10 w-fit mb-2 group-hover:bg-primary transition-colors">
+                        <Icon className="h-7 w-7 text-primary group-hover:text-white transition-colors" />
                       </div>
-                      <CardTitle>{structure.title}</CardTitle>
+                      <CardTitle>{s.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-sm text-muted-foreground">{structure.description}</p>
+                      <p className="text-sm text-muted-foreground">{s.description}</p>
                     </CardContent>
                   </Card>
                 );
@@ -97,18 +132,21 @@ const Services = () => {
           </section>
 
           {/* Legal Documents */}
-          <section className="mb-20">
-            <div className="flex items-center mb-8">
-              <FileText className="h-8 w-8 text-primary mr-3" />
-              <h2 className="font-heading font-bold text-3xl text-foreground">Documents Juridiques</h2>
+          <section>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2.5 rounded-xl bg-primary/10"><FileText className="h-6 w-6 text-primary" /></div>
+              <div>
+                <Badge variant="secondary" className="mb-2">Documents juridiques</Badge>
+                <h2 className="font-heading font-bold text-3xl text-foreground">Rédaction par des juristes certifiés</h2>
+              </div>
             </div>
             <Card className="border-2">
-              <CardContent className="p-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {legalDocuments.map((doc, index) => (
-                    <div key={index} className="flex items-center space-x-3">
-                      <div className="h-2 w-2 rounded-full bg-primary flex-shrink-0" />
-                      <span className="text-muted-foreground">{doc}</span>
+              <CardContent className="p-6 lg:p-10">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {legalDocuments.map((doc) => (
+                    <div key={doc} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors">
+                      <CheckCircle2 className="h-5 w-5 text-primary flex-shrink-0" />
+                      <span className="text-sm text-foreground">{doc}</span>
                     </div>
                   ))}
                 </div>
@@ -117,74 +155,64 @@ const Services = () => {
           </section>
 
           {/* Complementary Services */}
-          <section className="mb-20">
-            <div className="flex items-center mb-8">
-              <ShieldCheck className="h-8 w-8 text-primary mr-3" />
-              <h2 className="font-heading font-bold text-3xl text-foreground">Formalités incluses dans la création</h2>
+          <section>
+            <div className="flex items-center gap-3 mb-8">
+              <div className="p-2.5 rounded-xl bg-primary/10"><ShieldCheck className="h-6 w-6 text-primary" /></div>
+              <div>
+                <Badge variant="secondary" className="mb-2">Formalités incluses</Badge>
+                <h2 className="font-heading font-bold text-3xl text-foreground">Toutes les démarches officielles</h2>
+              </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {complementaryServices.map((service, index) => (
-                <Card key={index} className="hover:shadow-soft transition-all">
-                  <CardHeader>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {complementaryServices.map((service) => (
+                <Card key={service.title} className="hover:shadow-soft hover:border-primary transition-all">
+                  <CardHeader className="pb-3">
                     <CardTitle className="text-lg text-primary">{service.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-muted-foreground">{service.description}</p>
+                    <p className="text-xs text-muted-foreground">{service.description}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
           </section>
 
-          {/* CTA - No prices */}
-          <section className="mb-20">
-            <div className="bg-gradient-hero rounded-2xl p-12 text-center text-white">
-              <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-6">
-                Lancez votre projet dès maintenant
-              </h2>
-              <p className="text-lg mb-4 text-white/90 max-w-3xl mx-auto">
-                Remplissez le formulaire en ligne et recevez un devis personnalisé adapté à votre situation et votre localisation. Notre équipe d'experts vous accompagne à chaque étape.
+          {/* CTA */}
+          <section>
+            <div className="bg-gradient-hero rounded-3xl p-8 sm:p-12 lg:p-16 text-center text-white shadow-premium">
+              <Sparkles className="h-12 w-12 mx-auto mb-4 opacity-90" />
+              <h2 className="font-heading font-bold text-3xl sm:text-4xl mb-4">Lancez votre projet dès maintenant</h2>
+              <p className="text-white/85 max-w-2xl mx-auto mb-2">
+                Devis personnalisé en moins de 24h. Paiement sécurisé Mobile Money, carte et virement.
               </p>
-              <p className="text-sm text-white/70 mb-8">
-                💳 Paiement en ligne accepté : Mobile Money, carte bancaire et virement électronique
-              </p>
-              <Link to="/create">
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white shadow-strong text-lg px-8 py-6 h-auto font-semibold">
-                  Soumettre ma demande
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
+              <p className="text-sm text-white/70 mb-8">💳 Toutes les démarches incluses dans nos packs</p>
+              <Link to="/create"><Button size="lg" className="bg-accent hover:bg-accent/90 text-accent-foreground font-semibold text-base px-8 h-12">
+                Soumettre ma demande <ArrowRight className="ml-2 h-5 w-5" />
+              </Button></Link>
             </div>
           </section>
-          
-          {/* Additional Services Section */}
-          <section className="mb-20">
-            <h2 className="font-heading font-bold text-3xl text-foreground mb-4 text-center">Services Additionnels</h2>
-            <p className="text-center text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Des prestations complémentaires sur devis pour accompagner votre croissance
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[
-                { icon: FileText, title: "Structuration de Projet", desc: "Montage de business plan, études de faisabilité et conseil stratégique" },
-                { icon: GraduationCap, title: "Formation", desc: "Formation entrepreneuriale, gestion d'entreprise et accompagnement personnalisé" },
-                { icon: Briefcase, title: "Mobilisation de Financement", desc: "Recherche, montage de dossiers et mobilisation de financements" },
-                { icon: Building2, title: "Solutions Digitales", desc: "Conception de sites web, applications mobiles et solutions digitales sur mesure" },
-                { icon: FileText, title: "Identité Visuelle", desc: "Conception de logos, chartes graphiques et supports de communication" },
-                { icon: Briefcase, title: "Comptabilité & Fiscalité", desc: "Suivi comptable, déclarations fiscales et conseil en gestion financière" },
-              ].map((svc, i) => {
+
+          {/* Additional */}
+          <section>
+            <div className="text-center max-w-2xl mx-auto mb-10">
+              <Badge variant="secondary" className="mb-3">Services additionnels</Badge>
+              <h2 className="font-heading font-bold text-3xl text-foreground">Pour aller plus loin</h2>
+              <p className="text-muted-foreground mt-3">Prestations complémentaires sur devis pour accompagner votre croissance.</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {additional.map((svc) => {
                 const Icon = svc.icon;
                 return (
-                  <Card key={i} className="border-2 hover:shadow-strong transition-all">
+                  <Card key={svc.title} className="group border-2 hover:border-primary hover:shadow-strong hover:-translate-y-1 transition-all">
                     <CardHeader>
-                      <CardTitle className="flex items-center text-primary">
-                        <Icon className="h-6 w-6 mr-2" />{svc.title}
-                      </CardTitle>
+                      <div className="p-3 rounded-xl bg-primary/10 w-fit mb-2 group-hover:bg-primary transition-colors">
+                        <Icon className="h-6 w-6 text-primary group-hover:text-white transition-colors" />
+                      </div>
+                      <CardTitle className="text-primary">{svc.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-3">
-                      <p className="text-muted-foreground">{svc.desc}</p>
-                      <Link to="/service-request">
-                        <Button className="w-full" size="sm">Soumettre ma demande</Button>
-                      </Link>
+                      <p className="text-sm text-muted-foreground">{svc.desc}</p>
+                      <Link to="/service-request"><Button className="w-full" size="sm">Soumettre ma demande</Button></Link>
                     </CardContent>
                   </Card>
                 );
