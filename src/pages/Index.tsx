@@ -120,7 +120,7 @@ const Index = () => {
       <Header />
       
       {/* Hero Section - Split Layout */}
-      <section className="relative pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+      <section className="relative pt-24 pb-12 sm:pt-28 sm:pb-16 lg:pt-40 lg:pb-32 overflow-hidden">
         <div 
           className="absolute inset-0 bg-gradient-hero"
           style={{
