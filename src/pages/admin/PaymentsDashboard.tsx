@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -208,16 +209,17 @@ const PaymentsDashboard = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">{t('admin.paymentsManagement', 'Gestion des Paiements')}</h1>
-            <p className="text-slate-400 mt-1">{t('admin.paymentsTracking', 'Suivi des paiements et transactions')}</p>
-          </div>
-          <Button onClick={() => exportPaymentsToCSV(payments)} className="bg-primary hover:bg-primary/90">
-            <Download className="mr-2 h-4 w-4" />
-            {t('admin.exportCSV', 'Exporter CSV')}
-          </Button>
-        </div>
+        <AdminPageHeader
+          title={t('admin.paymentsManagement', 'Gestion des Paiements')}
+          description={t('admin.paymentsTracking', 'Suivi des paiements et transactions')}
+          icon={CreditCard}
+          actions={
+            <Button onClick={() => exportPaymentsToCSV(payments)} size="sm">
+              <Download className="mr-2 h-4 w-4" />
+              {t('admin.exportCSV', 'Exporter CSV')}
+            </Button>
+          }
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">

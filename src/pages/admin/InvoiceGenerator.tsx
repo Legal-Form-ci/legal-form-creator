@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useRef, useEffect } from 'react';
 import { useSiteSettings } from '@/hooks/useSiteSettings';
 import { useNavigate } from 'react-router-dom';
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Download, Plus, Trash2, FileText, Building2, Phone, Mail, MapPin, Calendar, User, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Plus, Trash2, FileText, Building2, Phone, Mail, MapPin, Calendar, User, Loader2, Receipt } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 
 interface InvoiceItem {
@@ -453,16 +454,17 @@ const InvoiceGenerator = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto py-8 px-4">
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" onClick={() => navigate('/admin/dashboard')}>
-            <ArrowLeft className="h-5 w-5 mr-2" />
-            Retour
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">Générateur de Factures</h1>
-            <p className="text-muted-foreground">Créez des factures professionnelles pour vos clients</p>
-          </div>
-        </div>
+        <AdminPageHeader
+          title="Générateur de Factures"
+          description="Créez des factures professionnelles pour vos clients"
+          icon={Receipt}
+          actions={
+            <Button variant="outline" size="sm" onClick={() => navigate('/admin/dashboard')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Retour
+            </Button>
+          }
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Formulaire */}

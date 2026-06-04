@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -186,17 +187,17 @@ const IdentityDocuments = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white">Documents d'identité</h1>
-            <p className="text-slate-400">Vérification des pièces d'identité uploadées</p>
-          </div>
-          <Button onClick={fetchDocuments} variant="outline" className="gap-2">
-            <RefreshCw className="h-4 w-4" />
-            Actualiser
-          </Button>
-        </div>
+        <AdminPageHeader
+          title="Documents d'identité"
+          description="Vérification des pièces d'identité uploadées"
+          icon={FileCheck}
+          actions={
+            <Button onClick={fetchDocuments} variant="outline" size="sm" className="gap-2">
+              <RefreshCw className="h-4 w-4" />
+              Actualiser
+            </Button>
+          }
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">

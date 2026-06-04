@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -139,15 +140,15 @@ const Tickets = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Support & Tickets</h1>
-            <p className="text-muted-foreground">Gérez les demandes d'assistance</p>
-          </div>
-          <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-            <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 mr-2" />Nouveau ticket</Button>
-            </DialogTrigger>
+        <AdminPageHeader
+          title="Support & Tickets"
+          description="Gérez les demandes d'assistance"
+          icon={MessageSquare}
+          actions={
+            <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+              <DialogTrigger asChild>
+                <Button size="sm"><Plus className="h-4 w-4 mr-2" />Nouveau ticket</Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Créer un ticket</DialogTitle>
@@ -178,7 +179,8 @@ const Tickets = () => {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
+          }
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[

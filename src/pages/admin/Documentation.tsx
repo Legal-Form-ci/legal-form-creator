@@ -1,8 +1,9 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Download, Book, Server, Shield, CreditCard, Users, Database, Settings, Loader2, UserCircle, Building2, HelpCircle, Wrench } from "lucide-react";
+import { FileText, Download, Book, BookOpen, Server, Shield, CreditCard, Users, Database, Settings, Loader2, UserCircle, Building2, HelpCircle, Wrench } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import jsPDF from 'jspdf';
 
@@ -820,11 +821,13 @@ const Documentation = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Documentation</h1>
-            <p className="text-slate-400 mt-1">Documentation technique complète et guides utilisateur</p>
-          </div>
+        <AdminPageHeader
+          title="Documentation"
+          description="Documentation technique complète et guides utilisateur"
+          icon={BookOpen}
+          actions={null}
+        />
+        <div className="flex justify-end -mt-2">
           <Button 
             onClick={generateDocumentation} 
             disabled={generating}

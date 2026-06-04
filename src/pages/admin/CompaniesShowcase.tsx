@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -116,13 +117,12 @@ const CompaniesShowcase = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Entreprises créées</h1>
-            <p className="text-muted-foreground">{companies.length} entreprises accompagnées</p>
-          </div>
-          <Button onClick={openCreate}><Plus className="h-4 w-4 mr-2" />Ajouter une entreprise</Button>
-        </div>
+        <AdminPageHeader
+          title="Entreprises créées"
+          description={`${companies.length} entreprises accompagnées`}
+          icon={Building2}
+          actions={<Button size="sm" onClick={openCreate}><Plus className="h-4 w-4 mr-2" />Ajouter une entreprise</Button>}
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">

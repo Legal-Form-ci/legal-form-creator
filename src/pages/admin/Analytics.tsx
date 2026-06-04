@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +8,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, AreaChart, Area
 } from "recharts";
-import { TrendingUp, TrendingDown, Building2, Users, CreditCard, FileText, Calendar, MapPin } from "lucide-react";
+import { TrendingUp, TrendingDown, Building2, Users, CreditCard, FileText, Calendar, MapPin, BarChart3 } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 
 const Analytics = () => {
@@ -115,10 +116,11 @@ const Analytics = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Statistiques</h1>
-          <p className="text-muted-foreground">Vue d'ensemble des performances de la plateforme</p>
-        </div>
+        <AdminPageHeader
+          title="Statistiques"
+          description="Vue d'ensemble des performances de la plateforme"
+          icon={BarChart3}
+        />
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

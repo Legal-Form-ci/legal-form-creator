@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -109,17 +110,17 @@ const AdminSettings = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Paramètres</h1>
-            <p className="text-slate-400 mt-1">Configurez les paramètres du site - Synchronisation automatique</p>
-          </div>
-          <Button onClick={refreshSettings} variant="outline" className="border-slate-600">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Rafraîchir
-          </Button>
-        </div>
+        <AdminPageHeader
+          title="Paramètres"
+          description="Configurez les paramètres du site — Synchronisation automatique"
+          icon={Settings}
+          actions={
+            <Button onClick={refreshSettings} variant="outline" size="sm">
+              <RefreshCw className="mr-2 h-4 w-4" />
+              Rafraîchir
+            </Button>
+          }
+        />
 
         <Tabs defaultValue="pricing" className="space-y-6">
           <TabsList className="bg-slate-800 border-slate-700">

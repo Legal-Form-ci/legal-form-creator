@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "./AdminLayout";
@@ -206,28 +207,23 @@ const LexIAConversations = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2">
-              <Bot className="h-8 w-8 text-primary" />
-              Conversations LexIA
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Gérez et analysez les conversations de l'assistant virtuel
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={fetchConversations}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Actualiser
-            </Button>
-            <Button onClick={exportReport}>
-              <Download className="h-4 w-4 mr-2" />
-              Exporter
-            </Button>
-          </div>
-        </div>
+        <AdminPageHeader
+          title="Conversations LexIA"
+          description="Gérez et analysez les conversations de l'assistant virtuel"
+          icon={Bot}
+          actions={
+            <>
+              <Button variant="outline" size="sm" onClick={fetchConversations}>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Actualiser
+              </Button>
+              <Button size="sm" onClick={exportReport}>
+                <Download className="h-4 w-4 mr-2" />
+                Exporter
+              </Button>
+            </>
+          }
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -121,10 +122,11 @@ const ForumManagement = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold">Gestion du Forum</h1>
-          <p className="text-muted-foreground">Modérez les publications et commentaires</p>
-        </div>
+        <AdminPageHeader
+          title="Gestion du Forum"
+          description="Modérez les publications et commentaires"
+          icon={MessageSquare}
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

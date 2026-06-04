@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +18,8 @@ import {
   FileText,
   MessageSquare,
   CreditCard,
-  Printer
+  Printer,
+  Building2
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -177,23 +179,23 @@ const CompaniesManagement = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Créations d'entreprise</h1>
-            <p className="text-slate-400 mt-1">{filteredRequests.length} demande(s) sur {requests.length}</p>
-          </div>
-          <Button 
-            onClick={() => {
-              exportCompanyRequests(requests);
-              toast({ title: "Export CSV lancé", description: "Le fichier sera téléchargé automatiquement" });
-            }} 
-            className="bg-primary hover:bg-primary/90"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            Exporter CSV
-          </Button>
-        </div>
+        <AdminPageHeader
+          title="Créations d'entreprise"
+          description={`${filteredRequests.length} demande(s) sur ${requests.length}`}
+          icon={Building2}
+          actions={
+            <Button
+              size="sm"
+              onClick={() => {
+                exportCompanyRequests(requests);
+                toast({ title: "Export CSV lancé", description: "Le fichier sera téléchargé automatiquement" });
+              }}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Exporter CSV
+            </Button>
+          }
+        />
 
         {/* Filters */}
         <Card className="bg-slate-800 border-slate-700">

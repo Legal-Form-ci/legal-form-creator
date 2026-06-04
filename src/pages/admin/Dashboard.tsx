@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { LogOut } from "lucide-react";
+import { LogOut, LayoutDashboard } from "lucide-react";
 
 interface CompanyRequest {
   id: string;
@@ -130,25 +131,22 @@ const AdminDashboard = () => {
       
       <main className="pt-32 pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="flex justify-between items-center mb-8">
-            <div>
-              <h1 className="font-heading font-bold text-4xl text-foreground mb-2">
-                Tableau de bord Admin
-              </h1>
-              <p className="text-muted-foreground">
-                Gérez toutes les demandes de création d'entreprises
-              </p>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => navigate('/admin/payments')}>
-                Gestion des Paiements
-              </Button>
-              <Button variant="outline" onClick={signOut}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Déconnexion
-              </Button>
-            </div>
-          </div>
+          <AdminPageHeader
+            title="Tableau de bord Admin"
+            description="Gérez toutes les demandes de création d'entreprises"
+            icon={LayoutDashboard}
+            actions={
+              <>
+                <Button variant="outline" size="sm" onClick={() => navigate('/admin/payments')}>
+                  Gestion des Paiements
+                </Button>
+                <Button variant="outline" size="sm" onClick={signOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Déconnexion
+                </Button>
+              </>
+            }
+          />
 
           <Card>
             <CardHeader>

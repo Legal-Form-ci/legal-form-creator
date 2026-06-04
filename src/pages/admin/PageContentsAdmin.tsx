@@ -1,3 +1,4 @@
+import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -117,10 +118,11 @@ const PageContentsAdmin = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Gestion des Pages Légales</h1>
-          <p className="text-muted-foreground mt-1">Modifiez le contenu des pages Conditions et Confidentialité</p>
-        </div>
+        <AdminPageHeader
+          title="Gestion des Pages Légales"
+          description="Modifiez le contenu des pages Conditions et Confidentialité"
+          icon={FileText}
+        />
 
         <Tabs defaultValue={pages[0]?.page_key || "terms"}>
           <TabsList>
