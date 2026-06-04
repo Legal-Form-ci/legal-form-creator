@@ -59,13 +59,13 @@ const News = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="pt-32 pb-12 bg-gradient-to-br from-primary to-primary/80">
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-10 sm:pb-12 bg-gradient-hero">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-4xl sm:text-5xl font-heading font-bold text-white mb-4">
+            <h1 className="text-3xl sm:text-5xl font-heading font-bold text-white mb-3 sm:mb-4">
               {t('news.title', 'Actualités')}
             </h1>
-            <p className="text-xl text-white/90">
+            <p className="text-base sm:text-xl text-white/90">
               {t('news.subtitle', 'Restez informé des dernières actualités juridiques et fiscales en Côte d\'Ivoire')}
             </p>
           </div>

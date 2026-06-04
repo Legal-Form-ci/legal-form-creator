@@ -156,10 +156,10 @@ const EbookDownload = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="pt-32 pb-20">
+
+      <main className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 lg:pb-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
-          <Card>
+          <Card className="shadow-premium">
             {ebook.cover_image && (
               <div className="aspect-video w-full overflow-hidden rounded-t-lg">
                 <img

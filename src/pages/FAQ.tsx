@@ -58,7 +58,7 @@ const FAQ = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <section className="pt-32 pb-16 bg-gradient-hero text-white">
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 bg-gradient-hero text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center">
             <div className="flex justify-center mb-6">
