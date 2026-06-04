@@ -476,7 +476,8 @@ const NewsManagement = () => {
               </div>
             </DialogContent>
           </Dialog>
-        </div>
+          }
+        />
 
         {/* Articles Table */}
         <Card>
