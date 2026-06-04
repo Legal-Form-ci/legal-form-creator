@@ -70,12 +70,15 @@ const Showcase = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-32 pb-20">
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 bg-gradient-hero text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Building2 className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-90" />
+          <h1 className="font-heading font-bold text-3xl sm:text-5xl mb-3 sm:mb-4">{t('nav.showcase')}</h1>
+          <p className="text-base sm:text-xl text-white/90 max-w-3xl mx-auto">Découvrez les entreprises que nous avons accompagnées avec succès</p>
+        </div>
+      </section>
+      <main className="py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h1 className="font-heading font-bold text-4xl sm:text-5xl text-foreground mb-6">{t('nav.showcase')}</h1>
-            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">Découvrez les entreprises que nous avons accompagnées avec succès</p>
-          </div>
           <div className="flex flex-col sm:flex-row gap-4 mb-12 max-w-2xl mx-auto">
             <Select value={filterRegion} onValueChange={setFilterRegion}><SelectTrigger><SelectValue placeholder="Région" /></SelectTrigger><SelectContent><SelectItem value="all">Toutes</SelectItem>{regions.map(r => <SelectItem key={r} value={r}>{r}</SelectItem>)}</SelectContent></Select>
             <Select value={filterType} onValueChange={setFilterType}><SelectTrigger><SelectValue placeholder="Type" /></SelectTrigger><SelectContent><SelectItem value="all">Tous</SelectItem>{types.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent></Select>

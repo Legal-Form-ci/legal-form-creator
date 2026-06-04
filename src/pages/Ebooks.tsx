@@ -59,18 +59,21 @@ const Ebooks = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="pt-32 pb-20">
+
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 bg-gradient-hero text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <BookOpen className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-90" />
+          <h1 className="font-heading font-bold text-3xl sm:text-5xl mb-3 sm:mb-4">
+            Ressources Gratuites
+          </h1>
+          <p className="text-base sm:text-xl text-white/90 max-w-2xl mx-auto">
+            Téléchargez nos modèles, guides et documents pour faciliter vos démarches juridiques
+          </p>
+        </div>
+      </section>
+
+      <main className="py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-          <div className="text-center mb-12">
-            <BookOpen className="h-16 w-16 text-primary mx-auto mb-4" />
-            <h1 className="font-heading font-bold text-5xl text-foreground mb-4">
-              Ressources Gratuites
-            </h1>
-            <p className="text-muted-foreground text-xl max-w-2xl mx-auto">
-              Téléchargez nos modèles, guides et documents pour faciliter vos démarches juridiques
-            </p>
-          </div>
 
           <div className="flex flex-wrap gap-2 justify-center mb-12">
             <Button

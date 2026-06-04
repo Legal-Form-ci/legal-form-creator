@@ -56,18 +56,20 @@ const Pricing = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      
-      <main className="pt-32 pb-20">
+
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-12 sm:pb-16 bg-gradient-hero text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="font-heading font-bold text-3xl sm:text-5xl lg:text-6xl mb-4 sm:mb-6">
+            Un accompagnement adapté à votre projet
+          </h1>
+          <p className="text-base sm:text-xl text-white/90 max-w-3xl mx-auto">
+            Soumettez votre demande et recevez un devis personnalisé selon votre situation, votre région et vos besoins.
+          </p>
+        </div>
+      </section>
+
+      <main className="py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hero */}
-          <div className="text-center mb-16">
-            <h1 className="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl text-foreground mb-6">
-              Un accompagnement adapté à votre projet
-            </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mx-auto">
-              Soumettez votre demande et recevez un devis personnalisé selon votre situation, votre région et vos besoins spécifiques.
-            </p>
-          </div>
 
           {/* Main Value Proposition */}
           <div className="max-w-4xl mx-auto mb-20">

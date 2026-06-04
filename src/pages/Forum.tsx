@@ -295,17 +295,19 @@ const Forum = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="pt-32 pb-20">
+      <section className="pt-24 sm:pt-28 lg:pt-32 pb-10 bg-gradient-hero text-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <MessageSquare className="h-12 w-12 sm:h-16 sm:w-16 mx-auto mb-4 opacity-90" />
+          <h1 className="font-heading font-bold text-3xl sm:text-5xl mb-3">
+            Forum de la Communauté
+          </h1>
+          <p className="text-base sm:text-lg text-white/90 max-w-xl mx-auto">
+            Échangez avec d'autres entrepreneurs, posez vos questions et partagez votre expérience
+          </p>
+        </div>
+      </section>
+      <main className="py-10 sm:py-14 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
-          {/* Header */}
-          <div className="text-center mb-10">
-            <h1 className="font-heading font-bold text-3xl sm:text-4xl text-foreground mb-3">
-              Forum de la Communauté
-            </h1>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Échangez avec d'autres entrepreneurs, posez vos questions et partagez votre expérience
-            </p>
-          </div>
 
           {/* Filters & Create */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
