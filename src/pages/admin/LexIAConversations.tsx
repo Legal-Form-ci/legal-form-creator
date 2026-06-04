@@ -217,11 +217,12 @@ const LexIAConversations = () => {
                 Actualiser
               </Button>
               <Button size="sm" onClick={exportReport}>
-              <Download className="h-4 w-4 mr-2" />
-              Exporter
-            </Button>
-          </div>
-        </div>
+                <Download className="h-4 w-4 mr-2" />
+                Exporter
+              </Button>
+            </>
+          }
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
