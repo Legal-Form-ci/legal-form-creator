@@ -142,10 +142,11 @@ const TestimonialsAdmin = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Gestion des témoignages</h1>
-          <p className="text-muted-foreground mt-1">Validez, rejetez avec motif (optionnel) ou supprimez les témoignages.</p>
-        </div>
+        <AdminPageHeader
+          title="Gestion des témoignages"
+          description="Validez, rejetez avec motif (optionnel) ou supprimez les témoignages."
+          icon={Star}
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card>

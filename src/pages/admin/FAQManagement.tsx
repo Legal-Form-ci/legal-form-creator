@@ -197,27 +197,22 @@ const FAQManagement = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <HelpCircle className="h-8 w-8 text-primary" />
-              Gestion des FAQ
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Gérez les questions fréquentes affichées sur le site public
-            </p>
-          </div>
-          <Dialog
-            open={dialogOpen}
-            onOpenChange={(open) => {
-              setDialogOpen(open);
-              if (!open) resetForm();
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button className="bg-primary hover:bg-primary/90">
-                <Plus className="mr-2 h-4 w-4" />
-                Nouvelle FAQ
+        <AdminPageHeader
+          title="Gestion des FAQ"
+          description="Gérez les questions fréquentes affichées sur le site public"
+          icon={HelpCircle}
+          actions={
+            <Dialog
+              open={dialogOpen}
+              onOpenChange={(open) => {
+                setDialogOpen(open);
+                if (!open) resetForm();
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button size="sm">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Nouvelle FAQ
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">

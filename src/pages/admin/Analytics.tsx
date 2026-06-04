@@ -115,10 +115,11 @@ const Analytics = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">Statistiques</h1>
-          <p className="text-muted-foreground">Vue d'ensemble des performances de la plateforme</p>
-        </div>
+        <AdminPageHeader
+          title="Statistiques"
+          description="Vue d'ensemble des performances de la plateforme"
+          icon={BarChart3}
+        />
 
         {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

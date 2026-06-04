@@ -74,14 +74,11 @@ const ContactMessages = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Messages de contact</h1>
-            <p className="text-muted-foreground">
-              {messages.length} messages · {unreadCount} non lu{unreadCount > 1 ? "s" : ""}
-            </p>
-          </div>
-        </div>
+        <AdminPageHeader
+          title="Messages de contact"
+          description={`${messages.length} messages · ${unreadCount} non lu${unreadCount > 1 ? "s" : ""}`}
+          icon={MessageSquare}
+        />
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

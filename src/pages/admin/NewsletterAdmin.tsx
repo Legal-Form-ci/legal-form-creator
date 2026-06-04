@@ -74,13 +74,14 @@ const NewsletterAdmin = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-bold flex items-center gap-2"><Mail className="h-7 w-7" /> Newsletter</h1>
-            <p className="text-muted-foreground">Gérez les abonnés à votre newsletter</p>
-          </div>
-          <Button onClick={exportCsv} variant="outline"><Download className="mr-2 h-4 w-4" /> Exporter CSV</Button>
-        </div>
+        <AdminPageHeader
+          title="Newsletter"
+          description="Gérez les abonnés à votre newsletter"
+          icon={Mail}
+          actions={
+            <Button onClick={exportCsv} variant="outline" size="sm"><Download className="mr-2 h-4 w-4" /> Exporter CSV</Button>
+          }
+        />
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           <Card>

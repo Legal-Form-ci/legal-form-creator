@@ -231,21 +231,17 @@ const DatabaseManager = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-              <Database className="h-8 w-8 text-primary" />
-              {t('admin.databaseManager', 'Gestionnaire de Base de Données')}
-            </h1>
-            <p className="text-slate-400 mt-1">
-              {t('admin.dbManagerDesc', 'Gérez, exportez et sauvegardez vos données')}
-            </p>
-          </div>
-          <Button onClick={fetchTableStats} variant="outline" disabled={loading}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            {t('admin.refresh', 'Actualiser')}
-          </Button>
-        </div>
+        <AdminPageHeader
+          title={t('admin.databaseManager', 'Gestionnaire de Base de Données')}
+          description={t('admin.dbManagerDesc', 'Gérez, exportez et sauvegardez vos données')}
+          icon={Database}
+          actions={
+            <Button onClick={fetchTableStats} variant="outline" size="sm" disabled={loading}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              {t('admin.refresh', 'Actualiser')}
+            </Button>
+          }
+        />
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

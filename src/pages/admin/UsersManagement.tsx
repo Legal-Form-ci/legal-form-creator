@@ -223,14 +223,11 @@ export default function UsersManagement() {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div>
-          <h1 className="font-heading font-bold text-3xl text-white mb-2">
-            Gestion des Utilisateurs
-          </h1>
-          <p className="text-slate-400">
-            Gérez les utilisateurs et leurs accès à la plateforme Legal Form
-          </p>
-        </div>
+        <AdminPageHeader
+          title="Gestion des Utilisateurs"
+          description="Gérez les utilisateurs et leurs accès à la plateforme Legal Form"
+          icon={Users}
+        />
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

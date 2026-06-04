@@ -128,13 +128,11 @@ const TeamManagement = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Équipe Legal Form</h1>
-            <p className="text-slate-400 mt-1">Gérez les membres de l'équipe et leurs permissions</p>
-          </div>
-        </div>
+        <AdminPageHeader
+          title="Équipe Legal Form"
+          description="Gérez les membres de l'équipe et leurs permissions"
+          icon={UserCog}
+        />
 
         {/* Role Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">

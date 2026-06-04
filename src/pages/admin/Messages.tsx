@@ -200,10 +200,11 @@ const AdminMessages = () => {
 
   return (
     <AdminLayout>
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Messagerie</h1>
-        <p className="text-muted-foreground">Communication avec les clients</p>
-      </div>
+      <AdminPageHeader
+        title="Messagerie"
+        description="Communication avec les clients"
+        icon={MessageSquare}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-200px)]">
         {/* Conversations List */}

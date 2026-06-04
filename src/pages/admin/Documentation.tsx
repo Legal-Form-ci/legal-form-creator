@@ -820,11 +820,13 @@ const Documentation = () => {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Documentation</h1>
-            <p className="text-slate-400 mt-1">Documentation technique complète et guides utilisateur</p>
-          </div>
+        <AdminPageHeader
+          title="Documentation"
+          description="Documentation technique complète et guides utilisateur"
+          icon={BookOpen}
+          actions={null}
+        />
+        <div className="flex justify-end -mt-2">
           <Button 
             onClick={generateDocumentation} 
             disabled={generating}
