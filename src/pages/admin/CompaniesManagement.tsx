@@ -18,7 +18,8 @@ import {
   FileText,
   MessageSquare,
   CreditCard,
-  Printer
+  Printer,
+  Building2
 } from "lucide-react";
 import {
   DropdownMenu,
