@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Download, Book, Server, Shield, CreditCard, Users, Database, Settings, Loader2, UserCircle, Building2, HelpCircle, Wrench } from "lucide-react";
+import { FileText, Download, Book, BookOpen, Server, Shield, CreditCard, Users, Database, Settings, Loader2, UserCircle, Building2, HelpCircle, Wrench } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 import jsPDF from 'jspdf';
 

@@ -8,7 +8,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, PieChart, Pie, Cell, AreaChart, Area
 } from "recharts";
-import { TrendingUp, TrendingDown, Building2, Users, CreditCard, FileText, Calendar, MapPin } from "lucide-react";
+import { TrendingUp, TrendingDown, Building2, Users, CreditCard, FileText, Calendar, MapPin, BarChart3 } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 
 const Analytics = () => {

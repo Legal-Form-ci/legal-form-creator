@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { ArrowLeft, Download, Plus, Trash2, FileText, Building2, Phone, Mail, MapPin, Calendar, User, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Plus, Trash2, FileText, Building2, Phone, Mail, MapPin, Calendar, User, Loader2, Receipt } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 
 interface InvoiceItem {

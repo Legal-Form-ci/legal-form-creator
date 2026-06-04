@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
-import { Shield, Users } from "lucide-react";
+import { Shield, Users, UserCog } from "lucide-react";
 import AdminLayout from "./AdminLayout";
 
 interface TeamMember {
