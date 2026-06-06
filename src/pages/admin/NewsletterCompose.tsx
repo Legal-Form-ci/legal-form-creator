@@ -307,10 +307,44 @@ const NewsletterCompose = () => {
                     placeholder="Ex : annoncer notre nouvelle offre de création SARL à 99 000 FCFA en mai, avec témoignage client."
                     rows={3}
                   />
-                  <Button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()} type="button">
-                    {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    Générer avec l'IA
-                  </Button>
+                  <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                    <Checkbox checked={aiWithImage} onCheckedChange={(v) => setAiWithImage(!!v)} />
+                    <ImageIcon className="h-4 w-4" />
+                    Générer aussi une image d'en-tête (IA)
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()} type="button">
+                      {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                      Générer avec l'IA
+                    </Button>
+                    <input
+                      ref={replaceImageRef}
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) replaceFirstImage(f);
+                        e.target.value = "";
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => replaceImageRef.current?.click()}
+                      disabled={replacingImage}
+                    >
+                      {replacingImage ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                      )}
+                      {hasImage ? "Remplacer l'image" : "Ajouter une image"}
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Le logo LegalForm est ajouté automatiquement en en-tête. Les images sont rendues responsive (max 600px) pour ne jamais déborder dans la boîte de réception.
+                  </p>
                 </div>
 
                 <div className="space-y-1.5">
