@@ -12,9 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users, Image as ImageIcon, Paperclip, Zap, Copy, Check } from "lucide-react";
+import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users, Image as ImageIcon, Paperclip, Zap, Copy, Check, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
 interface Campaign {
@@ -49,9 +50,14 @@ const NewsletterCompose = () => {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [aiWithImage, setAiWithImage] = useState(true);
+  const [replacingImage, setReplacingImage] = useState(false);
+  const replaceImageRef = useRef<HTMLInputElement>(null);
   const [segment, setSegment] = useState("subscribers");
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const hasImage = /<img\b[^>]*>/i.test(html);
 
   const validate = (opts: { requireSchedule?: boolean; requireTestEmail?: boolean } = {}): boolean => {
     const e: Record<string, string> = {};
