@@ -69,3 +69,26 @@ export function brandedEmail(opts: {
 function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+
+// Ensure all <img> tags in the email body are responsive and never overflow
+// the 600px email container in any client (Gmail strips <style> blocks).
+function sanitizeBodyImages(html: string): string {
+  if (!html) return "";
+  return html.replace(/<img\b([^>]*)>/gi, (_match, attrs) => {
+    let a = String(attrs);
+    // Remove any existing width / height attributes that could break responsiveness
+    a = a.replace(/\s(width|height)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+    // Merge or inject inline style
+    if (/\sstyle\s*=/.test(a)) {
+      a = a.replace(/\sstyle\s*=\s*("([^"]*)"|'([^']*)')/i, (_m, _q, dq, sq) => {
+        const existing = (dq ?? sq ?? "").trim().replace(/;?\s*$/, "");
+        const merged = `${existing}; max-width:100%; height:auto; display:block; margin:16px auto; border-radius:10px; border:0; outline:none;`;
+        return ` style="${merged}"`;
+      });
+    } else {
+      a += ` style="max-width:100%; height:auto; display:block; margin:16px auto; border-radius:10px; border:0; outline:none;"`;
+    }
+    return `<img${a}>`;
+  });
+}
+
