@@ -18,12 +18,22 @@ export function brandedEmail(opts: {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LegalForm</title>
+  <style>
+    img { max-width: 100% !important; height: auto !important; display: block; border: 0; outline: none; text-decoration: none; }
+    .email-body img { max-width: 100% !important; height: auto !important; margin-left: auto; margin-right: auto; border-radius: 10px; }
+    .email-body table { max-width: 100% !important; }
+    .email-body p, .email-body li { word-break: break-word; }
+    @media only screen and (max-width: 620px) {
+      .email-container { width: 100% !important; border-radius: 0 !important; }
+      .email-pad { padding: 20px !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background:#f5f7fa;font-family:Inter,-apple-system,Segoe UI,Roboto,Arial,sans-serif">
   <span style="display:none!important;visibility:hidden;opacity:0;height:0;width:0;font-size:1px;line-height:1px;color:#f5f7fa">${escapeHtml(preheader)}</span>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f7fa;padding:24px 0">
     <tr><td align="center">
-      <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+      <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
         <tr>
           <td style="background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%);padding:28px 32px;text-align:center">
             <a href="${SITE}" style="text-decoration:none;color:#ffffff">
@@ -33,8 +43,8 @@ export function brandedEmail(opts: {
           </td>
         </tr>
         <tr>
-          <td style="padding:32px">
-            ${bodyHtml}
+          <td class="email-body email-pad" style="padding:32px">
+            ${sanitizeBodyImages(bodyHtml)}
           </td>
         </tr>
         <tr>
