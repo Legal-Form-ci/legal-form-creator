@@ -113,7 +113,7 @@ const NewsletterCompose = () => {
     }
     setAiLoading(true);
     const { data, error } = await supabase.functions.invoke("ai-email-generate", {
-      body: { prompt: aiPrompt, subject },
+      body: { prompt: aiPrompt, subject, withImage: aiWithImage },
     });
     setAiLoading(false);
     if (error || data?.error) {
@@ -122,7 +122,37 @@ const NewsletterCompose = () => {
     }
     if (data?.html) {
       setHtml(data.html);
-      toast({ title: "Contenu généré ✨", description: "Vous pouvez l'éditer manuellement avant l'envoi." });
+      toast({
+        title: "Contenu généré ✨",
+        description: data.image_url
+          ? "Image et texte générés. Vous pouvez remplacer l'image avant l'envoi."
+          : "Vous pouvez l'éditer manuellement avant l'envoi.",
+      });
+    }
+  };
+
+  const replaceFirstImage = async (file: File) => {
+    setReplacingImage(true);
+    try {
+      const path = `image/replace-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
+      const { error } = await supabase.storage
+        .from("newsletter-assets")
+        .upload(path, file, { upsert: false, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("newsletter-assets").getPublicUrl(path);
+      const url = data.publicUrl;
+      let next = html;
+      if (/<img\b[^>]*>/i.test(html)) {
+        next = html.replace(/(<img\b[^>]*\ssrc\s*=\s*)("[^"]*"|'[^']*')/i, `$1"${url}"`);
+      } else {
+        next = `<p style="text-align:center;margin:0 0 24px"><img src="${url}" alt="" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:12px"/></p>\n${html}`;
+      }
+      setHtml(next);
+      toast({ title: "Image remplacée ✅" });
+    } catch (e: any) {
+      toast({ title: "Échec remplacement", description: e.message, variant: "destructive" });
+    } finally {
+      setReplacingImage(false);
     }
   };
 
