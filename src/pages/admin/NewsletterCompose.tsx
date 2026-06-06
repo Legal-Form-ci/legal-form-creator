@@ -12,9 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users, Image as ImageIcon, Paperclip, Zap, Copy, Check } from "lucide-react";
+import { Send, Save, Calendar, Loader2, Mail, Eye, ScrollText, Sparkles, Users, Image as ImageIcon, Paperclip, Zap, Copy, Check, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRef } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 
 interface Campaign {
@@ -49,9 +50,14 @@ const NewsletterCompose = () => {
   const [loading, setLoading] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [aiWithImage, setAiWithImage] = useState(true);
+  const [replacingImage, setReplacingImage] = useState(false);
+  const replaceImageRef = useRef<HTMLInputElement>(null);
   const [segment, setSegment] = useState("subscribers");
   const [counts, setCounts] = useState<Record<string, number>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const hasImage = /<img\b[^>]*>/i.test(html);
 
   const validate = (opts: { requireSchedule?: boolean; requireTestEmail?: boolean } = {}): boolean => {
     const e: Record<string, string> = {};
@@ -107,7 +113,7 @@ const NewsletterCompose = () => {
     }
     setAiLoading(true);
     const { data, error } = await supabase.functions.invoke("ai-email-generate", {
-      body: { prompt: aiPrompt, subject },
+      body: { prompt: aiPrompt, subject, withImage: aiWithImage },
     });
     setAiLoading(false);
     if (error || data?.error) {
@@ -116,7 +122,37 @@ const NewsletterCompose = () => {
     }
     if (data?.html) {
       setHtml(data.html);
-      toast({ title: "Contenu généré ✨", description: "Vous pouvez l'éditer manuellement avant l'envoi." });
+      toast({
+        title: "Contenu généré ✨",
+        description: data.image_url
+          ? "Image et texte générés. Vous pouvez remplacer l'image avant l'envoi."
+          : "Vous pouvez l'éditer manuellement avant l'envoi.",
+      });
+    }
+  };
+
+  const replaceFirstImage = async (file: File) => {
+    setReplacingImage(true);
+    try {
+      const path = `image/replace-${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_")}`;
+      const { error } = await supabase.storage
+        .from("newsletter-assets")
+        .upload(path, file, { upsert: false, contentType: file.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from("newsletter-assets").getPublicUrl(path);
+      const url = data.publicUrl;
+      let next = html;
+      if (/<img\b[^>]*>/i.test(html)) {
+        next = html.replace(/(<img\b[^>]*\ssrc\s*=\s*)("[^"]*"|'[^']*')/i, `$1"${url}"`);
+      } else {
+        next = `<p style="text-align:center;margin:0 0 24px"><img src="${url}" alt="" style="max-width:100%;height:auto;display:block;margin:0 auto;border-radius:12px"/></p>\n${html}`;
+      }
+      setHtml(next);
+      toast({ title: "Image remplacée ✅" });
+    } catch (e: any) {
+      toast({ title: "Échec remplacement", description: e.message, variant: "destructive" });
+    } finally {
+      setReplacingImage(false);
     }
   };
 
@@ -271,10 +307,44 @@ const NewsletterCompose = () => {
                     placeholder="Ex : annoncer notre nouvelle offre de création SARL à 99 000 FCFA en mai, avec témoignage client."
                     rows={3}
                   />
-                  <Button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()} type="button">
-                    {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
-                    Générer avec l'IA
-                  </Button>
+                  <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer">
+                    <Checkbox checked={aiWithImage} onCheckedChange={(v) => setAiWithImage(!!v)} />
+                    <ImageIcon className="h-4 w-4" />
+                    Générer aussi une image d'en-tête (IA)
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    <Button onClick={generateWithAI} disabled={aiLoading || !aiPrompt.trim()} type="button">
+                      {aiLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
+                      Générer avec l'IA
+                    </Button>
+                    <input
+                      ref={replaceImageRef}
+                      type="file"
+                      accept="image/*"
+                      hidden
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) replaceFirstImage(f);
+                        e.target.value = "";
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => replaceImageRef.current?.click()}
+                      disabled={replacingImage}
+                    >
+                      {replacingImage ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <RefreshCw className="mr-2 h-4 w-4" />
+                      )}
+                      {hasImage ? "Remplacer l'image" : "Ajouter une image"}
+                    </Button>
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Le logo LegalForm est ajouté automatiquement en en-tête. Les images sont rendues responsive (max 600px) pour ne jamais déborder dans la boîte de réception.
+                  </p>
                 </div>
 
                 <div className="space-y-1.5">

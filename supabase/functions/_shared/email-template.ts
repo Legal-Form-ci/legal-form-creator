@@ -18,12 +18,22 @@ export function brandedEmail(opts: {
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>LegalForm</title>
+  <style>
+    img { max-width: 100% !important; height: auto !important; display: block; border: 0; outline: none; text-decoration: none; }
+    .email-body img { max-width: 100% !important; height: auto !important; margin-left: auto; margin-right: auto; border-radius: 10px; }
+    .email-body table { max-width: 100% !important; }
+    .email-body p, .email-body li { word-break: break-word; }
+    @media only screen and (max-width: 620px) {
+      .email-container { width: 100% !important; border-radius: 0 !important; }
+      .email-pad { padding: 20px !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background:#f5f7fa;font-family:Inter,-apple-system,Segoe UI,Roboto,Arial,sans-serif">
   <span style="display:none!important;visibility:hidden;opacity:0;height:0;width:0;font-size:1px;line-height:1px;color:#f5f7fa">${escapeHtml(preheader)}</span>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:#f5f7fa;padding:24px 0">
     <tr><td align="center">
-      <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
+      <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
         <tr>
           <td style="background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%);padding:28px 32px;text-align:center">
             <a href="${SITE}" style="text-decoration:none;color:#ffffff">
@@ -33,8 +43,8 @@ export function brandedEmail(opts: {
           </td>
         </tr>
         <tr>
-          <td style="padding:32px">
-            ${bodyHtml}
+          <td class="email-body email-pad" style="padding:32px">
+            ${sanitizeBodyImages(bodyHtml)}
           </td>
         </tr>
         <tr>
@@ -59,3 +69,26 @@ export function brandedEmail(opts: {
 function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
+
+// Ensure all <img> tags in the email body are responsive and never overflow
+// the 600px email container in any client (Gmail strips <style> blocks).
+function sanitizeBodyImages(html: string): string {
+  if (!html) return "";
+  return html.replace(/<img\b([^>]*)>/gi, (_match, attrs) => {
+    let a = String(attrs);
+    // Remove any existing width / height attributes that could break responsiveness
+    a = a.replace(/\s(width|height)\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, "");
+    // Merge or inject inline style
+    if (/\sstyle\s*=/.test(a)) {
+      a = a.replace(/\sstyle\s*=\s*("([^"]*)"|'([^']*)')/i, (_m, _q, dq, sq) => {
+        const existing = (dq ?? sq ?? "").trim().replace(/;?\s*$/, "");
+        const merged = `${existing}; max-width:100%; height:auto; display:block; margin:16px auto; border-radius:10px; border:0; outline:none;`;
+        return ` style="${merged}"`;
+      });
+    } else {
+      a += ` style="max-width:100%; height:auto; display:block; margin:16px auto; border-radius:10px; border:0; outline:none;"`;
+    }
+    return `<img${a}>`;
+  });
+}
+
