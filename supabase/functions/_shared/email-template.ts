@@ -25,9 +25,13 @@ export function brandedEmail(opts: {
     .email-body img { max-width: 100% !important; height: auto !important; margin-left: auto; margin-right: auto; border-radius: 10px; }
     .email-body table { max-width: 100% !important; }
     .email-body p, .email-body li { word-break: break-word; }
+    /* Strict logo rule: always centered, never overflows on mobile or desktop */
+    .email-logo-cell { text-align: center !important; padding: 24px 16px !important; }
+    .email-logo { display: block !important; margin: 0 auto !important; max-width: 120px !important; width: 100% !important; height: auto !important; object-fit: contain !important; }
     @media only screen and (max-width: 620px) {
       .email-container { width: 100% !important; border-radius: 0 !important; }
       .email-pad { padding: 20px !important; }
+      .email-logo { max-width: 96px !important; }
     }
   </style>
 </head>
@@ -37,9 +41,9 @@ export function brandedEmail(opts: {
     <tr><td align="center">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
         <tr>
-          <td style="background:#0f766e;padding:24px 32px;text-align:center">
-            <a href="${SITE}" style="text-decoration:none;display:inline-block">
-              <img src="${LOGO_URL}" alt="LegalForm" width="120" height="120" style="display:block;margin:0 auto;width:120px;max-width:120px;height:auto;border:0;outline:none;background:#0f766e" />
+          <td class="email-logo-cell" style="background:#0f766e;padding:24px 16px;text-align:center">
+            <a href="${SITE}" style="text-decoration:none;display:inline-block;max-width:100%">
+              <img class="email-logo" src="${LOGO_URL}" alt="LegalForm" width="120" height="120" style="display:block;margin:0 auto;width:120px;max-width:120px;height:auto;border:0;outline:none;background:#0f766e;object-fit:contain" />
             </a>
           </td>
         </tr>
