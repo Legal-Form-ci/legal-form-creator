@@ -83,9 +83,12 @@ const AdminDashboard = () => {
       return;
     }
 
+    const { notifyStatusChange } = await import('@/lib/notify');
+    notifyStatusChange({ requestId: id, requestType: 'company', newStatus: status }).catch(() => {});
+
     toast({
       title: "Succès",
-      description: "Statut mis à jour",
+      description: "Statut mis à jour, client notifié",
     });
 
     fetchRequests();
