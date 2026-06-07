@@ -25,9 +25,13 @@ export function brandedEmail(opts: {
     .email-body img { max-width: 100% !important; height: auto !important; margin-left: auto; margin-right: auto; border-radius: 10px; }
     .email-body table { max-width: 100% !important; }
     .email-body p, .email-body li { word-break: break-word; }
+    /* Strict logo rule: always centered, never overflows on mobile or desktop */
+    .email-logo-cell { text-align: center !important; padding: 24px 16px !important; }
+    .email-logo { display: block !important; margin: 0 auto !important; max-width: 120px !important; width: 100% !important; height: auto !important; object-fit: contain !important; }
     @media only screen and (max-width: 620px) {
       .email-container { width: 100% !important; border-radius: 0 !important; }
       .email-pad { padding: 20px !important; }
+      .email-logo { max-width: 96px !important; }
     }
   </style>
 </head>
