@@ -37,10 +37,9 @@ export function brandedEmail(opts: {
     <tr><td align="center">
       <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="email-container" style="max-width:600px;width:100%;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06)">
         <tr>
-          <td style="background:linear-gradient(135deg,#0f766e 0%,#0d9488 100%);padding:28px 32px;text-align:center">
-            <a href="${SITE}" style="text-decoration:none;color:#ffffff">
-              <img src="${LOGO_URL}" alt="LegalForm" width="140" style="display:inline-block;max-width:140px;height:auto;border:0;outline:none" />
-              <div style="margin-top:8px;font-family:Inter,Arial,sans-serif;color:#ffffff;font-size:18px;font-weight:700;letter-spacing:0.5px">Legal Form</div>
+          <td style="background:#0f766e;padding:24px 32px;text-align:center">
+            <a href="${SITE}" style="text-decoration:none;display:inline-block">
+              <img src="${LOGO_URL}" alt="LegalForm" width="120" height="120" style="display:block;margin:0 auto;width:120px;max-width:120px;height:auto;border:0;outline:none;background:#0f766e" />
             </a>
           </td>
         </tr>
