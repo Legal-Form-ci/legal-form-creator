@@ -91,6 +91,16 @@ const RequestMessaging = ({ requestId, requestType }: RequestMessagingProps) => 
 
       if (error) throw error;
 
+      // Best-effort cross-side notification (in-app + email)
+      const senderRole: "client" | "admin" = userRole === "admin" ? "admin" : "client";
+      notifyRequestMessage({
+        requestId,
+        requestType,
+        senderRole,
+        message: newMessage.trim(),
+        senderName: (user as any)?.user_metadata?.full_name || user.email,
+      }).catch(() => {});
+
       setNewMessage("");
       toast({
         title: "Message envoyé",
