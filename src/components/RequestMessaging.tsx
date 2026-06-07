@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Send, User } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { notifyRequestMessage } from "@/lib/notify";
 
 interface Message {
   id: string;
