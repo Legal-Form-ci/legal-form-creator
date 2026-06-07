@@ -1,9 +1,11 @@
 // Shared branded HTML wrapper for all outgoing LegalForm emails
 // Logo URL is configurable via EMAIL_LOGO_URL secret (recommended: a public Supabase storage URL).
 // Fallback uses the Lovable published URL where /logo.png is served from public/.
+// Official LegalForm logo hosted on the Lovable assets CDN (always reachable,
+// independent of the published site). Override via EMAIL_LOGO_URL secret if needed.
 const LOGO_URL =
   Deno.env.get("EMAIL_LOGO_URL") ||
-  "https://doc-duplicator-wiz.lovable.app/logo.png";
+  "https://doc-duplicator-wiz.lovable.app/__l5e/assets-v1/c2fc5c1a-c242-49dd-b63b-302dae0d2c9c/legalform-logo-email.png";
 const SITE = Deno.env.get("EMAIL_SITE_URL") || "https://www.legalform.ci";
 
 export function brandedEmail(opts: {
