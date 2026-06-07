@@ -254,6 +254,16 @@ const InvoiceGenerator = () => {
       return null;
     }
 
+    // Best-effort: notify client of the new invoice (in-app + email)
+    try {
+      const { notifyInvoiceCreated } = await import('@/lib/notify');
+      notifyInvoiceCreated({
+        userId,
+        invoiceNumber: invoiceData.invoiceNumber,
+        amount: calculateTotal(),
+      }).catch(() => {});
+    } catch {}
+
     return invoice;
   };
 

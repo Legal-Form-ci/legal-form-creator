@@ -119,7 +119,11 @@ const CompanyDetail = () => {
 
       if (error) throw error;
 
-      toast({ title: "Succès", description: "Statut mis à jour" });
+      // Notify client (in-app + email)
+      const { notifyStatusChange } = await import('@/lib/notify');
+      notifyStatusChange({ requestId: request.id, requestType: 'company', newStatus: status }).catch(() => {});
+
+      toast({ title: "Succès", description: "Statut mis à jour, client notifié" });
       fetchRequest();
     } catch (error) {
       toast({
