@@ -53,7 +53,8 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
       navigate("/auth", { replace: true });
       return;
     }
-    if (userRole !== null && userRole !== "admin" && userRole !== "team") {
+    const staff = ["admin", "team", "team_support", "team_content", "team_finance"];
+    if (userRole !== null && !staff.includes(userRole)) {
       navigate("/client/dashboard", { replace: true });
     }
   }, [user, userRole, loading, navigate]);
