@@ -1122,6 +1122,7 @@ export type Database = {
           referral_earnings: number | null
           referral_link: string | null
           referred_by: string | null
+          total_referred: number
           updated_at: string
           user_id: string
         }
@@ -1138,6 +1139,7 @@ export type Database = {
           referral_earnings?: number | null
           referral_link?: string | null
           referred_by?: string | null
+          total_referred?: number
           updated_at?: string
           user_id: string
         }
@@ -1154,8 +1156,42 @@ export type Database = {
           referral_earnings?: number | null
           referral_link?: string | null
           referred_by?: string | null
+          total_referred?: number
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      referral_events: {
+        Row: {
+          amount: number
+          created_at: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          referred_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          referred_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          referred_id?: string
+          referrer_id?: string
+          status?: string
         }
         Relationships: []
       }
@@ -1297,6 +1333,33 @@ export type Database = {
           request_type?: string
           sender_id?: string | null
           sender_role?: string | null
+        }
+        Relationships: []
+      }
+      role_permissions: {
+        Row: {
+          can_edit: boolean
+          can_view: boolean
+          created_at: string
+          id: string
+          page_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Insert: {
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          page_key: string
+          role: Database["public"]["Enums"]["app_role"]
+        }
+        Update: {
+          can_edit?: boolean
+          can_view?: boolean
+          created_at?: string
+          id?: string
+          page_key?: string
+          role?: Database["public"]["Enums"]["app_role"]
         }
         Relationships: []
       }
@@ -1646,6 +1709,13 @@ export type Database = {
       }
     }
     Functions: {
+      has_any_role: {
+        Args: {
+          _roles: Database["public"]["Enums"]["app_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1655,6 +1725,7 @@ export type Database = {
       }
       increment_blog_views: { Args: { post_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       reset_stuck_newsletter_campaigns: { Args: never; Returns: Json }
       unsubscribe_newsletter: { Args: { _email: string }; Returns: boolean }
     }
