@@ -1,60 +1,82 @@
-# Refonte globale LegalForm + corrections mailing
+# Plan — Finalisation complète production
 
-L'ampleur demandée (refonte complète public + admin + premium + tous formulaires/dashboards + 5 chantiers mailing) représente plusieurs dizaines d'heures de travail. Pour livrer du **propre**, je découpe en lots livrables. Tu valides ce plan, j'enchaîne lot par lot sans nouvelles questions.
+4 lots livrés en parallèle. Tout passe par migrations + edge functions + UI admin/client + notifications déjà en place.
 
----
+## Lot 1 — Rôles équipe granulaires & permissions
 
-## LOT 1 — Fondations design (charte + popup) — *immédiat*
+**Migration DB**
+- Étendre l'enum `app_role` : `admin`, `team_support`, `team_content`, `team_finance`, `team`, `client`.
+- Helper `public.has_any_role(_user_id uuid, _roles app_role[])` (SECURITY DEFINER).
+- Helper `public.is_staff(_user_id uuid)` = admin OU tout team_*.
+- Mettre à jour les policies RLS sensibles (factures, paiements, tickets, messages, contenus) pour utiliser `has_any_role` au lieu de `is_admin` seul.
+- Table `role_permissions` (role → pages autorisées) pour piloter le menu admin.
 
-1. **Charte graphique alignée logo** dans `src/index.css` :
-   - Primary teal `#0f766e` (déjà en place, on le garde — c'est la couleur du logo)
-   - Accent or/jaune réservé aux highlights (CTA secondaires, badges premium)
-   - Tokens : `--surface`, `--surface-elevated`, `--border-soft`, `--shadow-premium`, `--gradient-hero`, `--radius-premium`
-   - Typo : Inter (UI) + Playfair Display (titres premium)
-2. **Fix WelcomePopup responsive** : `max-w-[min(560px,calc(100vw-2rem))]`, `max-h-[calc(100dvh-2rem)]`, scroll interne, padding mobile, fermeture tactile.
-3. Spacing system unifié (8/12/16/24/32/48/64).
+**UI**
+- `useTeamPermissions()` hook → expose `{canManageUsers, canManageContent, canManageFinance, canManageSupport, canManageSettings}`.
+- `AdminLayout` : filtrage dynamique du menu selon rôle.
+- `TeamManagement` : invitation membre + sélection rôle granulaire + révocation, envoi mail d'invitation.
+- Garde de route `<RequireRole roles={[...]} />` sur chaque page `/admin/*`.
 
-## LOT 2 — Navbar + Hero carousel actualités
+## Lot 2 — CRUD & relations clients ↔ demandes ↔ factures ↔ paiements ↔ documents
 
-1. **Header refait** inspiré Belife :
-   - Top-bar fine (contact + réseaux + langue)
-   - Nav principale centrée, espacée, avec mega-menu sur "Services"
-   - Bouton "Mon Espace" / "Connexion" **détaché**, pill arrondi, gradient teal→teal-glow, ombre douce
-   - Menu mobile drawer plein écran
-2. **Hero carousel actualités** sur `/` :
-   - Pull `news` table (limit 5, ordre `published_at desc`)
-   - Embla autoplay 6s, flèches, dots, pause au hover
-   - Slide : image full-bleed + overlay gradient + titre + résumé + CTA "Lire l'article"
-   - Responsive 16:9 desktop, 4:3 tablette, 4:5 mobile
+**Audit & corrections**
+- Vérifier FK : `service_requests.user_id`, `company_requests.user_id`, `invoices.request_id`, `payments.invoice_id`, `request_documents_exchange.request_id`, `identity_documents.user_id`.
+- Ajouter les FK manquantes + index.
+- Trigger `set_updated_at` sur toutes les tables métier qui n'en ont pas.
 
-## LOT 3 — Mailing : éditeur visuel + logs + monitoring
+**Edge functions** (toutes best-effort, ne bloquent pas le métier)
+- `request-status-change` : update statut → notif client (in-app + email) + log audit.
+- `invoice-lifecycle` : create/send/paid → mail + notif + génération PDF.
+- `document-exchange-notify` : upload admin → alerte client ; upload client → alerte admins selon rôle (support/finance).
+- `payment-confirmation` : webhook FedaPay déjà ok, brancher notif admin finance + email reçu client.
 
-1. **Page `/admin/newsletter/logs`** : filtres campagne / provider / statut / date + recherche email + colonne provider (parse `via:brevo|via:resend` depuis `error_message`).
-2. **Monitoring temps-réel** : abonnement realtime sur `newsletter_send_logs` filtré par campagne, barre de progression live, compteurs succès/échec, liste des échecs déroulable.
-3. **Éditeur visuel campagnes** : bloc-builder (Header / Texte / Image / Bouton / Séparateur / Citation), réordonnable, upload image vers bucket `newsletter-assets`, upload document → lien attaché, preview live, sérialisation JSON + génération HTML branded.
-4. **Auto-send Actualités/Opportunités** : table `newsletter_automations` (source, frequency, segment, time_of_day, last_run_at, is_active), edge function `auto-newsletter-dispatch` planifiée par pg_cron (toutes les heures) qui crée et envoie une campagne pour chaque actualité/opportunité non encore diffusée selon les règles.
+**UI**
+- `ClientDashboard` : timeline unifiée (demandes, documents, factures, messages) avec actions CRUD.
+- `CompanyDetail` (admin) : onglets Documents / Factures / Paiements / Messages / Historique — tous CRUD live.
+- Boutons « marquer payée », « renvoyer facture », « générer reçu », « clôturer demande ».
 
-## LOT 4 — Refonte pages publiques
+## Lot 3 — Contenus publics (Blog, News, FAQ, Forum, Témoignages, Showcase, Pages, Ebooks)
 
-Pages : Home, Services, Pricing, About, Contact, Blog, News, Forum, Testimonials, FAQ, Ebooks, Showcase.
-Patterns : sections aérées (py-20 lg:py-28), grilles 12 cols, cards `rounded-2xl shadow-premium`, micro-anims `fade-in` + `hover-scale`, illustrations / icônes Lucide cohérentes.
+- Audit CRUD admin de chaque table : create/edit/delete/publish/draft, image cover, SEO meta.
+- Modération : témoignages et forum_replies → workflow `pending → approved/rejected` + notif auteur.
+- Affichage public : vérifier filtre `is_published=true` partout + tri + pagination.
+- Ebooks : tracker `ebook_downloads` + email avec lien sécurisé.
+- `PageContentsAdmin` : édition WYSIWYG des blocs Home/About/Services/Contact.
 
-## LOT 5 — Refonte espaces authentifiés
+## Lot 4 — Module parrainage (referral) finalisé
 
-- Client : Dashboard, Profile, Messages, RequestDetail, Payment.
-- Admin : tous les modules sous `/admin/*` — sidebar repensée, headers de page unifiés, tableaux responsive (cards en mobile), formulaires en `<Form>` shadcn cohérents.
-- Premium : badges, gradient or, séparation visuelle claire.
+**Migration**
+- Colonnes manquantes sur `profiles` : `referral_code` (unique, auto-généré), `referred_by` (uuid → profiles), `referral_balance` (numeric, default 0), `total_referred` (int, default 0).
+- Table `referral_events` : `referrer_id`, `referred_id`, `event_type` (signup/first_payment/payout), `amount`, `status`.
+- Trigger : à la première facture payée d'un filleul → créditer 10% au parrain dans `referral_balance` + insérer event.
+- `referral_withdrawals` déjà existe → brancher workflow.
 
-## LOT 6 — QA responsive globale
+**Edge functions**
+- `referral-generate-code` : à la création profil.
+- `referral-credit` : déclenché par trigger paiement.
+- `referral-payout-approve` : admin valide retrait → notif + email + statut updated.
 
-Pass mobile (375), tablette (768), desktop (1280, 1536) sur chaque page modifiée. Correction overflows, alignements, touch targets ≥44px.
+**UI**
+- `ReferralSection` (client) : code perso, lien à partager (boutons WhatsApp/FB/copier), solde, historique events, formulaire demande retrait (MTN/Orange/Wave).
+- `/admin/referral-withdrawals` : liste demandes, approuver/rejeter, notes admin, export CSV.
+- Bandeau dashboard client : « Tu as X filleuls / Y FCFA disponibles ».
 
----
+## Ordre d'exécution
 
-## Ce que je fais MAINTENANT si tu approuves
+1. Migration unique consolidée (roles + permissions + referral + FK manquantes + triggers).
+2. Edge functions déployées en parallèle.
+3. Hooks + composants partagés (`useTeamPermissions`, `RequireRole`).
+4. Pages admin & client mises à jour en parallèle par lot.
+5. Vérif build + smoke test des principaux flux.
 
-Je démarre **LOT 1 + LOT 2 + popup fix** dans un seul cycle (les fondations conditionnent tout le reste). Puis j'enchaîne LOT 3 (mailing complet) dans le cycle suivant. LOT 4–6 viendront ensuite, page par page, en te montrant l'avancement.
+## Détails techniques
 
-Ordre : **1+2 → 3 → 4 → 5 → 6**.
+- Aucune modification du logo email (déjà OK).
+- Réutilisation de `src/lib/notify.ts` et `notify-message-thread`.
+- Pas de changement design system, juste tokens existants.
+- Tous les `service_role` côté edge functions ; jamais exposés client.
 
-Approuve pour que je lance LOT 1+2 immédiatement.
+## Hors scope
+
+- Pas de refonte UI/UX, pas de nouveau provider de paiement, pas de migration de stack.
+- Pas de tests E2E automatisés (uniquement vérifs build + lints).
