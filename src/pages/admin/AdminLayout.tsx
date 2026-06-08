@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useRealtimeNotifications } from "@/hooks/useRealtimeNotifications";
+import { useTeamPermissions } from "@/hooks/useTeamPermissions";
 import { 
   LayoutDashboard, Users, Building2, FileText, MessageSquare, Settings, CreditCard,
   Star, LogOut, Menu, X, ChevronDown, ChevronRight, BarChart3, Briefcase, Newspaper,
@@ -19,6 +20,7 @@ interface NavItem {
   href: string;
   icon: React.ComponentType<{ className?: string }>;
   badge?: number;
+  pageKey?: string;
 }
 
 interface NavGroup {
@@ -26,6 +28,7 @@ interface NavGroup {
   icon: React.ComponentType<{ className?: string }>;
   items: NavItem[];
 }
+
 
 const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
   const { user, userRole, signOut, loading } = useAuth();
@@ -53,7 +56,8 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
       navigate("/auth", { replace: true });
       return;
     }
-    if (userRole !== null && userRole !== "admin" && userRole !== "team") {
+    const staff = ["admin", "team", "team_support", "team_content", "team_finance"];
+    if (userRole !== null && !staff.includes(userRole)) {
       navigate("/client/dashboard", { replace: true });
     }
   }, [user, userRole, loading, navigate]);
@@ -83,70 +87,79 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
     });
   }, [location.pathname]);
 
-  const navGroups: NavGroup[] = [
+  const { can, isAdmin } = useTeamPermissions();
+
+  const allGroups: NavGroup[] = [
     {
       label: "Général",
       icon: LayoutDashboard,
       items: [
-        { label: "Tableau de bord", href: "/admin/dashboard", icon: LayoutDashboard },
-        { label: "Statistiques", href: "/admin/analytics", icon: BarChart3 },
+        { label: "Tableau de bord", href: "/admin/dashboard", icon: LayoutDashboard, pageKey: "dashboard" },
+        { label: "Statistiques", href: "/admin/analytics", icon: BarChart3, pageKey: "analytics" },
       ]
     },
     {
       label: "Clients & Demandes",
       icon: Users,
       items: [
-        { label: "Créations d'entreprise", href: "/admin/companies", icon: Building2 },
-        { label: "Demandes de services", href: "/admin/services", icon: Briefcase },
-        { label: "Documents ID", href: "/admin/identity-documents", icon: IdCard },
-        { label: "Utilisateurs", href: "/admin/users", icon: Users },
+        { label: "Créations d'entreprise", href: "/admin/companies", icon: Building2, pageKey: "companies" },
+        { label: "Demandes de services", href: "/admin/services", icon: Briefcase, pageKey: "services" },
+        { label: "Documents ID", href: "/admin/identity-documents", icon: IdCard, pageKey: "identity-documents" },
+        { label: "Utilisateurs", href: "/admin/users", icon: Users, pageKey: "users" },
       ]
     },
     {
       label: "Communication",
       icon: MessageSquare,
       items: [
-        { label: "Messagerie", href: "/admin/messages", icon: MessagesSquare },
-        { label: "Contacts", href: "/admin/contacts", icon: Contact },
-        { label: "Tickets", href: "/admin/tickets", icon: MessageSquare },
-        { label: "Conversations Legal Pro", href: "/admin/lexia", icon: MessageSquare },
+        { label: "Messagerie", href: "/admin/messages", icon: MessagesSquare, pageKey: "messages" },
+        { label: "Contacts", href: "/admin/contacts", icon: Contact, pageKey: "contacts" },
+        { label: "Tickets", href: "/admin/tickets", icon: MessageSquare, pageKey: "tickets" },
+        { label: "Conversations Legal Pro", href: "/admin/lexia", icon: MessageSquare, pageKey: "lexia" },
       ]
     },
     {
       label: "Contenu",
       icon: Newspaper,
       items: [
-        { label: "Actualités", href: "/admin/news", icon: Newspaper },
-        { label: "Newsletter — Abonnés", href: "/admin/newsletter", icon: Newspaper },
-        { label: "Newsletter — Composer", href: "/admin/newsletter/compose", icon: Newspaper },
-        { label: "Newsletter — Journal", href: "/admin/newsletter/logs", icon: Newspaper },
-        { label: "Newsletter — Automatisations", href: "/admin/newsletter/automations", icon: Newspaper },
-        { label: "Forum", href: "/admin/forum", icon: MessagesSquare },
-        { label: "Témoignages", href: "/admin/testimonials", icon: Star },
-        { label: "Réalisations", href: "/admin/showcase", icon: Trophy },
-        { label: "FAQ", href: "/admin/faq", icon: HelpCircle },
+        { label: "Actualités", href: "/admin/news", icon: Newspaper, pageKey: "news" },
+        { label: "Newsletter — Abonnés", href: "/admin/newsletter", icon: Newspaper, pageKey: "newsletter" },
+        { label: "Newsletter — Composer", href: "/admin/newsletter/compose", icon: Newspaper, pageKey: "newsletter" },
+        { label: "Newsletter — Journal", href: "/admin/newsletter/logs", icon: Newspaper, pageKey: "newsletter" },
+        { label: "Newsletter — Automatisations", href: "/admin/newsletter/automations", icon: Newspaper, pageKey: "newsletter" },
+        { label: "Forum", href: "/admin/forum", icon: MessagesSquare, pageKey: "forum" },
+        { label: "Témoignages", href: "/admin/testimonials", icon: Star, pageKey: "testimonials" },
+        { label: "Réalisations", href: "/admin/showcase", icon: Trophy, pageKey: "showcase" },
+        { label: "FAQ", href: "/admin/faq", icon: HelpCircle, pageKey: "faq" },
+        { label: "Pages", href: "/admin/pages", icon: FileText, pageKey: "pages" },
       ]
     },
     {
       label: "Finances",
       icon: CreditCard,
       items: [
-        { label: "Paiements", href: "/admin/payments", icon: CreditCard },
-        { label: "Factures", href: "/admin/invoices", icon: Receipt },
-        { label: "Retraits parrainage", href: "/admin/referral-withdrawals", icon: Wallet },
+        { label: "Paiements", href: "/admin/payments", icon: CreditCard, pageKey: "payments" },
+        { label: "Factures", href: "/admin/invoices", icon: Receipt, pageKey: "invoices" },
+        { label: "Retraits parrainage", href: "/admin/referral-withdrawals", icon: Wallet, pageKey: "referral-withdrawals" },
       ]
     },
     {
       label: "Système",
       icon: Settings,
       items: [
-        { label: "Équipe interne", href: "/admin/team", icon: UserCog },
-        { label: "Base de données", href: "/admin/database", icon: Database },
-        { label: "Documentation", href: "/admin/documentation", icon: BookOpen },
-        { label: "Paramètres", href: "/admin/settings", icon: Settings },
+        { label: "Équipe interne", href: "/admin/team", icon: UserCog, pageKey: "team" },
+        { label: "Base de données", href: "/admin/database", icon: Database, pageKey: "database" },
+        { label: "Documentation", href: "/admin/documentation", icon: BookOpen, pageKey: "documentation" },
+        { label: "Paramètres", href: "/admin/settings", icon: Settings, pageKey: "settings" },
       ]
     },
   ];
+
+  // Filtre selon permissions du rôle
+  const navGroups: NavGroup[] = allGroups
+    .map(g => ({ ...g, items: g.items.filter(i => !i.pageKey || isAdmin || can(i.pageKey)) }))
+    .filter(g => g.items.length > 0);
+
 
   const toggleGroup = (label: string) => {
     setOpenGroups(prev => ({ ...prev, [label]: !prev[label] }));
