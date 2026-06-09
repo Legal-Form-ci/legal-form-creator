@@ -258,7 +258,7 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     if (resendApiKey && userEmail) {
       try {
-        const emailHtml = buildEmailHtml(notif.title, notif.message, notifLink, type);
+        const emailHtml = buildEmailHtml(notif.title, notif.message, notifLink, type, ctaText);
         const emailRes = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
