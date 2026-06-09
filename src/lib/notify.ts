@@ -27,15 +27,23 @@ export async function notifyInvoiceCreated(opts: {
   userId: string;
   invoiceNumber: string;
   amount: number;
+  requestId?: string | null;
+  requestType?: "company" | "service";
 }) {
   try {
     const amountFmt = new Intl.NumberFormat("fr-FR").format(opts.amount) + " FCFA";
+    // Direct pay link if we know the request, else fall back to dashboard.
+    const payLink = opts.requestId
+      ? `/payment/${opts.requestId}`
+      : "/client/dashboard";
     await supabase.functions.invoke("send-notification", {
       body: {
         userId: opts.userId,
         type: "announcement",
-        customMessage: `Une nouvelle facture ${opts.invoiceNumber} d'un montant de ${amountFmt} a été émise. Consultez votre espace client pour la payer.`,
-        link: "/client/dashboard",
+        customTitle: `Nouvelle facture ${opts.invoiceNumber}`,
+        customMessage: `Une nouvelle facture <strong>${opts.invoiceNumber}</strong> d'un montant de <strong>${amountFmt}</strong> a été émise.\n\nCliquez sur le bouton ci-dessous pour la régler en un clic via Mobile Money ou carte bancaire. Le paiement sera confirmé automatiquement et votre dossier mis à jour immédiatement.`,
+        link: payLink,
+        ctaText: "💳 Payer maintenant",
       },
     });
   } catch (e) {
