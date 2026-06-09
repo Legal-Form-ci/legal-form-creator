@@ -11,8 +11,12 @@ interface NotificationRequest {
   type: 'signup' | 'login' | 'password_reset' | 'status_change' | 'new_request' | 'payment_received' | 'announcement' | 'security' | 'opportunity' | 'email_confirmation' | 'document_validated' | 'document_rejected';
   newStatus?: string;
   customMessage?: string;
+  customTitle?: string;
   link?: string;
+  ctaText?: string;
 }
+
+const LOGO_URL = 'https://doc-duplicator-wiz.lovable.app/__l5e/assets-v1/f104de46-a136-45a7-8a45-036dcb1edcc0/legalform-logo-email.png';
 
 const SITE_URL = 'https://legalform.ci';
 const SITE_NAME = 'Legal Form SARL';
