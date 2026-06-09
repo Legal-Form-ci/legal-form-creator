@@ -1,4 +1,5 @@
 import { AdminPageHeader } from "@/components/admin/AdminPageHeader";
+import MarketingTabs from "@/components/admin/MarketingTabs";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "./AdminLayout";
@@ -75,6 +76,7 @@ const NewsletterAdmin = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        <MarketingTabs />
         <AdminPageHeader
           title="Newsletter"
           description="Gérez les abonnés à votre newsletter"

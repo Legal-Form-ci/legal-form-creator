@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "./AdminLayout";
+import MarketingTabs from "@/components/admin/MarketingTabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -100,6 +101,7 @@ const NewsletterAutomations = () => {
   return (
     <AdminLayout>
       <div className="space-y-6">
+        <MarketingTabs />
         <div className="flex items-center gap-3 flex-wrap">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/admin/newsletter/compose"><ArrowLeft className="h-4 w-4 mr-1" /> Retour</Link>
