@@ -11,8 +11,12 @@ interface NotificationRequest {
   type: 'signup' | 'login' | 'password_reset' | 'status_change' | 'new_request' | 'payment_received' | 'announcement' | 'security' | 'opportunity' | 'email_confirmation' | 'document_validated' | 'document_rejected';
   newStatus?: string;
   customMessage?: string;
+  customTitle?: string;
   link?: string;
+  ctaText?: string;
 }
+
+const LOGO_URL = 'https://doc-duplicator-wiz.lovable.app/__l5e/assets-v1/f104de46-a136-45a7-8a45-036dcb1edcc0/legalform-logo-email.png';
 
 const SITE_URL = 'https://legalform.ci';
 const SITE_NAME = 'Legal Form SARL';
@@ -130,9 +134,9 @@ function getEmailCta(type: string): string {
   }
 }
 
-function buildEmailHtml(title: string, message: string, link: string, type: string) {
-  const fullLink = link ? `${SITE_URL}${link}` : SITE_URL;
-  const ctaText = getEmailCta(type);
+function buildEmailHtml(title: string, message: string, link: string, type: string, ctaTextOverride?: string) {
+  const fullLink = link ? (link.startsWith('http') ? link : `${SITE_URL}${link}`) : SITE_URL;
+  const ctaText = ctaTextOverride || getEmailCta(type);
 
   return `<!DOCTYPE html>
 <html lang="fr">
@@ -145,7 +149,7 @@ function buildEmailHtml(title: string, message: string, link: string, type: stri
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
   <!-- Header -->
   <tr><td style="background:linear-gradient(135deg,#17a2b8,#0d7a8c);padding:35px 40px;text-align:center;">
-    <img src="${SITE_URL}/images/agricapital-logo.jpg" alt="Legal Form SARL" width="64" height="64" style="border-radius:50%;margin-bottom:12px;border:3px solid rgba(255,255,255,0.3);">
+    <img src="${LOGO_URL}" alt="Legal Form SARL" width="80" height="80" style="display:block;margin:0 auto 12px;max-width:80px;height:auto;border-radius:12px;background:#ffffff;padding:6px;">
     <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:700;letter-spacing:0.5px;">${SITE_NAME}</h1>
     <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:13px;">Votre partenaire pour la création d'entreprise en Côte d'Ivoire</p>
   </td></tr>
@@ -195,7 +199,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const body: NotificationRequest = await req.json()
-    const { userId, requestId, type, newStatus, customMessage, link } = body
+    const { userId, requestId, type, newStatus, customMessage, customTitle, link, ctaText } = body
 
     let targetUserId = userId
     let userName = ''
@@ -229,6 +233,7 @@ Deno.serve(async (req) => {
     }
 
     const notif = generateNotification(type, userName || 'Utilisateur', { newStatus, customMessage, requestId });
+    if (customTitle) notif.title = customTitle;
     const notifLink = link || notif.link;
 
     // Insert in-app notification
@@ -253,7 +258,7 @@ Deno.serve(async (req) => {
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
     if (resendApiKey && userEmail) {
       try {
-        const emailHtml = buildEmailHtml(notif.title, notif.message, notifLink, type);
+        const emailHtml = buildEmailHtml(notif.title, notif.message, notifLink, type, ctaText);
         const emailRes = await fetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: {
