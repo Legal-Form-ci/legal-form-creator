@@ -7,7 +7,7 @@ import {
   LayoutDashboard, Users, Building2, FileText, MessageSquare, Settings, CreditCard,
   Star, LogOut, Menu, X, ChevronDown, ChevronRight, BarChart3, Briefcase, Newspaper,
   Database, Sun, Moon, Shield, Wallet, BookOpen, HelpCircle, MessagesSquare, Contact,
-  Trophy, UserCog, Receipt, IdCard
+  Trophy, UserCog, Receipt, IdCard, Megaphone
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -122,11 +122,8 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
       label: "Contenu",
       icon: Newspaper,
       items: [
+        { label: "Campagnes Marketing", href: "/admin/marketing", icon: Megaphone, pageKey: "newsletter" },
         { label: "Actualités", href: "/admin/news", icon: Newspaper, pageKey: "news" },
-        { label: "Newsletter — Abonnés", href: "/admin/newsletter", icon: Newspaper, pageKey: "newsletter" },
-        { label: "Newsletter — Composer", href: "/admin/newsletter/compose", icon: Newspaper, pageKey: "newsletter" },
-        { label: "Newsletter — Journal", href: "/admin/newsletter/logs", icon: Newspaper, pageKey: "newsletter" },
-        { label: "Newsletter — Automatisations", href: "/admin/newsletter/automations", icon: Newspaper, pageKey: "newsletter" },
         { label: "Forum", href: "/admin/forum", icon: MessagesSquare, pageKey: "forum" },
         { label: "Témoignages", href: "/admin/testimonials", icon: Star, pageKey: "testimonials" },
         { label: "Réalisations", href: "/admin/showcase", icon: Trophy, pageKey: "showcase" },
