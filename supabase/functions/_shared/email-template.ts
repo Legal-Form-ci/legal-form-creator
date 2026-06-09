@@ -5,7 +5,7 @@
 // independent of the published site). Override via EMAIL_LOGO_URL secret if needed.
 const LOGO_URL =
   Deno.env.get("EMAIL_LOGO_URL") ||
-  "https://doc-duplicator-wiz.lovable.app/__l5e/assets-v1/c2fc5c1a-c242-49dd-b63b-302dae0d2c9c/legalform-logo-email.png";
+  "https://doc-duplicator-wiz.lovable.app/__l5e/assets-v1/f104de46-a136-45a7-8a45-036dcb1edcc0/legalform-logo-email.png";
 const SITE = Deno.env.get("EMAIL_SITE_URL") || "https://www.legalform.ci";
 
 export function brandedEmail(opts: {
