@@ -261,6 +261,8 @@ const InvoiceGenerator = () => {
         userId,
         invoiceNumber: invoiceData.invoiceNumber,
         amount: calculateTotal(),
+        requestId: invoiceData.requestId || null,
+        requestType: (invoiceData.requestType as 'company' | 'service') || 'company',
       }).catch(() => {});
     } catch {}
 
