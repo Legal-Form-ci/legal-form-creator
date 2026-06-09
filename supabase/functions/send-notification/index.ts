@@ -149,7 +149,7 @@ function buildEmailHtml(title: string, message: string, link: string, type: stri
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
   <!-- Header -->
   <tr><td style="background:linear-gradient(135deg,#17a2b8,#0d7a8c);padding:35px 40px;text-align:center;">
-    <img src="${SITE_URL}/images/agricapital-logo.jpg" alt="Legal Form SARL" width="64" height="64" style="border-radius:50%;margin-bottom:12px;border:3px solid rgba(255,255,255,0.3);">
+    <img src="${LOGO_URL}" alt="Legal Form SARL" width="80" height="80" style="display:block;margin:0 auto 12px;max-width:80px;height:auto;border-radius:12px;background:#ffffff;padding:6px;">
     <h1 style="color:#ffffff;margin:0;font-size:26px;font-weight:700;letter-spacing:0.5px;">${SITE_NAME}</h1>
     <p style="color:rgba(255,255,255,0.85);margin:6px 0 0;font-size:13px;">Votre partenaire pour la création d'entreprise en Côte d'Ivoire</p>
   </td></tr>
