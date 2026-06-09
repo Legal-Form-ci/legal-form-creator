@@ -134,9 +134,9 @@ function getEmailCta(type: string): string {
   }
 }
 
-function buildEmailHtml(title: string, message: string, link: string, type: string) {
-  const fullLink = link ? `${SITE_URL}${link}` : SITE_URL;
-  const ctaText = getEmailCta(type);
+function buildEmailHtml(title: string, message: string, link: string, type: string, ctaTextOverride?: string) {
+  const fullLink = link ? (link.startsWith('http') ? link : `${SITE_URL}${link}`) : SITE_URL;
+  const ctaText = ctaTextOverride || getEmailCta(type);
 
   return `<!DOCTYPE html>
 <html lang="fr">
