@@ -233,6 +233,7 @@ Deno.serve(async (req) => {
     }
 
     const notif = generateNotification(type, userName || 'Utilisateur', { newStatus, customMessage, requestId });
+    if (customTitle) notif.title = customTitle;
     const notifLink = link || notif.link;
 
     // Insert in-app notification
