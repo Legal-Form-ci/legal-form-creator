@@ -199,7 +199,7 @@ Deno.serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
     const body: NotificationRequest = await req.json()
-    const { userId, requestId, type, newStatus, customMessage, link } = body
+    const { userId, requestId, type, newStatus, customMessage, customTitle, link, ctaText } = body
 
     let targetUserId = userId
     let userName = ''
