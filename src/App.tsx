@@ -72,6 +72,7 @@ import PageContentsAdmin from "./pages/admin/PageContentsAdmin";
 import NewsletterCompose from "./pages/admin/NewsletterCompose";
 import NewsletterLogs from "./pages/admin/NewsletterLogs";
 import NewsletterAutomations from "./pages/admin/NewsletterAutomations";
+import MarketingCampaigns from "./pages/admin/MarketingCampaigns";
 import NewsletterUnsubscribe from "./pages/NewsletterUnsubscribe";
 
 const queryClient = new QueryClient();
@@ -159,6 +160,7 @@ const App = () => (
           <Route path="/actualites/:slug" element={<BlogPost />} />
           <Route path="/news" element={<News />} />
           <Route path="/admin/news" element={<NewsManagement />} />
+          <Route path="/admin/marketing" element={<MarketingCampaigns />} />
           <Route path="/admin/newsletter" element={<NewsletterAdmin />} />
           <Route path="/admin/newsletter/compose" element={<NewsletterCompose />} />
           <Route path="/admin/newsletter/logs" element={<NewsletterLogs />} />
